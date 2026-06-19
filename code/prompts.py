@@ -1,42 +1,46 @@
 """
-Prompt templates for the Vision LLM.
+Prompt templates for the vision observation extractor.
 """
 
-SYSTEM_PROMPT = "You are a damage claim verifier. Classify visible damage from images."
+SYSTEM_PROMPT = (
+    "You are a visual evidence extractor. Return visual observations only. "
+    "Never output claim_status, approval, rejection, or policy decisions."
+)
 
-USER_PROMPT_TEMPLATE = """Analyse image(s) for this claim.
+USER_PROMPT_TEMPLATE = """Analyze every image separately for this claim.
 
 Object: {claim_object}
 User says: {user_claim}
+Image count: {image_count}
 
-**Allowed issue types:** dent, scratch, crack, glass_shatter, broken_part, missing_part, torn_packaging, crushed_packaging, water_damage, stain, none, unknown
-**Allowed object parts:** {object_parts}
-**Severity:** none, low, medium, high, unknown
+Allowed damage types: dent, scratch, crack, broken_part, missing_part, glass_shatter, water_damage, torn_packaging, crushed_packaging, stain, none, unknown
+Allowed object parts: {object_parts}
+Allowed image_quality values: good, adequate, poor, unknown
 
-**Rules for claim_supported:**
-- true = damage EXISTS in the claimed area, even if exact type differs (e.g. user says scratch, you see dent → true)
-- true = the claim is broadly correct about there being damage
-- false = ONLY if the relevant area is completely undamaged/pristine
-- false = ONLY if damage is on a completely different object part
+Return strict JSON only, with no markdown fences.
 
-Return JSON with booleans as true/false, not strings:
+Required JSON shape:
 {{
-  "image_assessments": [{{
+  "per_image_assessments": [{{
     "image_id": "img_1",
+    "damage_visible": true,
+    "damage_type": "dent",
+    "object_part": "front_bumper",
+    "image_quality": "good",
     "is_clear": true,
     "is_cropped": false,
     "lighting_adequate": true,
     "angle_sufficient": true,
     "issues_visible": ["dent"],
     "affected_parts": ["front_bumper"],
-    "damage_description": "Small dent visible."
+    "damage_description": "Small dent visible.",
+    "confidence": 0.87
   }}],
-  "overall_issue_type": "dent",
-  "overall_object_part": "front_bumper",
-  "claim_supported": true,
-  "supporting_image_ids": ["img_1"],
-  "contradiction_reason": null,
-  "severity": "low",
-  "confidence": 0.9,
+  "damage_visible": true,
+  "damage_type": "dent",
+  "object_part": "front_bumper",
+  "image_quality": "good",
+  "supporting_images": ["img_1"],
+  "confidence": 0.87,
   "notes": ""
 }}"""

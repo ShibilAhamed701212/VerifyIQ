@@ -49,6 +49,9 @@ class Config:
         "text_instruction_present": ["text in image", "label", "note", "instruction"],
         "user_history_risk": [],
         "manual_review_required": [],
+        "evidence_insufficient": [],
+        "low_confidence": [],
+        "object_part_mismatch": [],
     })
 
     ALLOWED_ISSUE_TYPES = {
@@ -74,5 +77,7 @@ class Config:
         "wrong_angle", "wrong_object", "wrong_object_part",
         "damage_not_visible", "claim_mismatch", "possible_manipulation",
         "non_original_image", "text_instruction_present",
-        "user_history_risk", "manual_review_required", "none"
+        "user_history_risk", "manual_review_required",
+        "evidence_insufficient", "low_confidence", "object_part_mismatch",
+        "none"
     }

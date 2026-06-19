@@ -1,0 +1,145 @@
+P1: You are a Staff AI Engineer participating in the HackerRank Orchestrate June 2026 challenge.
+P2: Your task is to refactor and upgrade the existing Multi-Modal Evidence Review project into a high-scoring competition submission.
+P3: IMPORTANT:
+P4: Preserve challenge output schema.
+P5: Preserve compatibility with dataset files.
+P6: Focus on accuracy, explainability, robustness, and evaluation quality.
+P7: The final system must be deterministic and interview-defensible.
+P8: ================================================== TARGET ARCHITECTURE ==================================================
+P9: Images + Claim ↓ Qwen2.5-VL-3B Vision Analyzer ↓ Evidence Checker ↓ Rule Engine ↓ Risk Analyzer ↓ Decision Agent ↓ Output Validator ↓ output.csv
+P10: The vision model should extract facts only.
+P11: The final decision must be made by deterministic logic.
+P12: ================================================== VISION ANALYZER ==================================================
+P13: Refactor vision_analyzer.py.
+P14: The vision model must NEVER directly output claim_status.
+P15: Return only observations.
+P16: Required JSON:
+P17: { “damage_visible”: true, “damage_type”: “dent”, “object_part”: “front_bumper”, “image_quality”: “good”, “supporting_images”: [“img1”], “confidence”: 0.87, “notes”: “” }
+P18: Allowed damage types:
+P19: dent scratch crack broken_part missing_part glass_shatter water_damage torn_packaging crushed_packaging stain none unknown
+P20: The model must return strict JSON only.
+P21: ================================================== CLAIM PARSER ==================================================
+P22: Create claim_parser.py.
+P23: Extract:
+P24: claimed_damage_type claimed_object_part
+P25: from user_claim.
+P26: Use:
+P27: keyword matching
+P28: regex
+P29: normalization rules
+P30: Examples:
+P31: “scratch on bumper” → scratch + front_bumper
+P32: “screen cracked” → crack + screen
+P33: Return normalized values.
+P34: ================================================== EVIDENCE CHECKER ==================================================
+P35: Create evidence_checker.py.
+P36: Current system incorrectly assumes evidence requirements are integers.
+P37: Evidence requirements are natural language descriptions.
+P38: Implement semantic evidence validation.
+P39: Examples:
+P40: “The bumper should be visible from an angle where deformation can be assessed.”
+P41: Check:
+P42: bumper visible
+P43: image quality sufficient
+P44: angle sufficient
+P45: Return:
+P46: { “evidence_standard_met”: true, “reason”: “Front bumper visible and damage assessable.” }
+P47: Evidence checker must NOT rely on image count.
+P48: ================================================== RULE ENGINE ==================================================
+P49: Create rule_engine.py.
+P50: This component determines claim status.
+P51: Rules:
+P52: IF damage_visible == false: claim_status = contradicted
+P53: ELIF visible_object_part != claimed_object_part: claim_status = contradicted
+P54: ELIF visible_damage_type != claimed_damage_type: claim_status = not_enough_information
+P55: ELIF confidence < 0.50: claim_status = not_enough_information add low_confidence flag
+P56: ELIF evidence_standard_met == false: claim_status = not_enough_information
+P57: ELSE: claim_status = supported
+P58: Return:
+P59: { “claim_status”: “…”, “justification”: “…” }
+P60: ================================================== MULTI-IMAGE REASONING ==================================================
+P61: If multiple images exist:
+P62: Analyze all images individually.
+P63: Create per-image assessments.
+P64: Aggregate using voting.
+P65: Example:
+P66: image1 -> dent visible image2 -> dent visible image3 -> unclear
+P67: Final result: damage_visible = true
+P68: Use majority evidence.
+P69: Do not allow one blurry image to override multiple clear images.
+P70: ================================================== RISK ANALYZER ==================================================
+P71: Refactor risk_analyzer.py.
+P72: Possible flags:
+P73: blurry_image cropped_or_obstructed low_confidence claim_mismatch object_part_mismatch damage_not_visible user_history_risk manual_review_required
+P74: Add manual_review_required when:
+P75: confidence < 0.50
+P76: multiple risk flags
+P77: conflicting images
+P78: user_history_risk
+P79: ================================================== DECISION AGENT ==================================================
+P80: Create decision_agent.py.
+P81: Inputs:
+P82: vision_result claim_parser_result evidence_result rule_engine_result risk_result
+P83: Decision agent is the ONLY module allowed to produce final output row.
+P84: Outputs:
+P85: claim_status claim_status_justification severity risk_flags
+P86: ================================================== SEVERITY ENGINE ==================================================
+P87: Create severity_engine.py.
+P88: Mapping:
+P89: glass_shatter -> high water_damage -> high
+P90: crack -> medium broken_part -> medium missing_part -> medium crushed_packaging -> medium
+P91: dent -> low scratch -> low stain -> low torn_packaging -> low
+P92: Boost one level when claim text contains:
+P93: severe major extensive large heavy deep significant smashed
+P94: ================================================== OUTPUT VALIDATION ==================================================
+P95: Create output_validator.py.
+P96: Validate:
+P97: issue_type object_part severity risk_flags claim_status
+P98: Unknown values must be mapped to safe defaults.
+P99: No invalid enums should reach output.csv.
+P100: ================================================== EXPLAINABILITY ==================================================
+P101: Every claim must generate a reasoning trace.
+P102: Example:
+P103: Claimed dent on front bumper. Dent visible in image2. Evidence standard satisfied. Confidence 0.88. No conflicting evidence. Claim supported.
+P104: Store as: claim_status_justification
+P105: ================================================== ERROR ANALYSIS ==================================================
+P106: Create evaluation/error_analysis.py
+P107: For each wrong prediction:
+P108: Store:
+P109: claim_id expected predicted reason
+P110: Generate:
+P111: error_report.md
+P112: Group errors by:
+P113: damage type mismatch object part mismatch confidence issue evidence issue
+P114: ================================================== EVALUATION METRICS ==================================================
+P115: Upgrade evaluation.
+P116: Report:
+P117: accuracy precision recall f1 score
+P118: supported accuracy contradicted accuracy not_enough_information accuracy
+P119: risk flag accuracy
+P120: Generate evaluation_report.md automatically.
+P121: ================================================== INTERVIEW DEFENSE ==================================================
+P122: Document architecture decisions.
+P123: Explain:
+P124: Why vision model only extracts facts.
+P125: Why deterministic rules make decisions.
+P126: How hallucinations are reduced.
+P127: How evidence requirements are validated.
+P128: How confidence thresholds are used.
+P129: How risk escalation works.
+P130: How multi-image voting works.
+P131: Why explainability improves trust.
+P132: Generate: ARCHITECTURE.md
+P133: ================================================== SUCCESS CRITERIA ==================================================
+P134: The upgraded solution should:
+P135: be modular
+P136: be explainable
+P137: support multiple images
+P138: use deterministic decisions
+P139: include confidence calibration
+P140: include semantic evidence validation
+P141: include error analysis
+P142: include evaluation metrics
+P143: preserve challenge schema
+P144: improve sample evaluation performance
+P145: be ready for AI judge interview discussion

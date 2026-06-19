@@ -2,7 +2,7 @@
 
 ## Overview
 
-This system processes damage claims across three object types: **cars**, **laptops**, and **packages**. It analyses submitted images using a Vision LLM (GPT-4o or Claude 3.5 Sonnet), cross-references with the user's claim text and history, and outputs a deterministic decision for each claim.
+This system processes damage claims across three object types: **cars**, **laptops**, and **packages**. It analyses submitted images using Gemini Vision, cross-references the findings with the user's claim text and history, and outputs a deterministic decision for each claim.
 
 ## Setup
 
@@ -13,9 +13,8 @@ This system processes damage claims across three object types: **cars**, **lapto
 
 2. **Set API Key**:
    ```bash
-   export OPENAI_API_KEY="your-api-key"
+   export GEMINI_API_KEY="your-api-key"
    ```
-   (For Claude, set `ANTHROPIC_API_KEY` instead.)
 
 3. **Place dataset**: Ensure the `dataset/` folder (with `claims.csv`, `user_history.csv`, `evidence_requirements.csv`, and `images/`) is in the project root.
 
@@ -46,12 +45,33 @@ Edit `code/config.py` to adjust:
 ```
 main.py                 # Orchestrator
   claim_processor.py    # Core claim pipeline
-    vision_analyzer.py  # Vision LLM client
-    evidence_requirements.py  # Evidence standard checker
+    claim_parser.py     # Deterministic claim text parser
+    vision_analyzer.py  # Gemini vision client
+    evidence_checker.py # Semantic evidence standard checker
+    rule_engine.py      # Deterministic claim-vs-image verification rules
     risk_analyzer.py    # Risk flags & severity
+    severity_engine.py  # Deterministic severity mapping
+    decision_agent.py   # Final output row builder
+    output_validator.py # Schema and enum enforcement
   evaluation/
     evaluate.py         # Evaluation runner
+    error_analysis.py   # Grouped error report generator
 ```
+
+## Updated Decision Flow
+
+```
+Vision Analysis
+  -> Claim Parser
+  -> Semantic Evidence Checker
+  -> Rule Engine
+  -> Risk Analyzer
+  -> Decision Agent
+  -> Output Validation
+  -> output.csv
+```
+
+Only `decision_agent.py` builds the final output row. The rule engine compares claimed issue and part against visible issue and part, applies confidence thresholds, and emits an explainable intermediate decision.
 
 ## Key Features
 

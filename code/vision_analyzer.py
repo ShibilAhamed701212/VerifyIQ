@@ -1,6 +1,8 @@
 """
-Vision LLM client using Google Gemini (free tier).
-Reads images, sends to Gemini with structured JSON output, returns normalized analysis.
+Vision observation extractor using Google Gemini.
+
+The vision model extracts facts only. Deterministic downstream modules make
+claim-status, risk, and severity decisions.
 """
 
 import json
@@ -9,7 +11,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from google import genai
 from google.genai import types
@@ -48,24 +50,18 @@ class GeminiVisionClient:
             image_count=len(image_paths),
             object_parts=", ".join(object_parts),
         )
-
-        full_prompt = f"{SYSTEM_PROMPT}\n\n{prompt}"
-
-        parts = [types.Part.from_text(text=full_prompt)]
+        parts = [types.Part.from_text(text=f"{SYSTEM_PROMPT}\n\n{prompt}")]
 
         for img_path in image_paths[:self.config.max_images_per_claim]:
             if not img_path.exists():
                 logger.warning(f"Image not found: {img_path}")
                 continue
             try:
-                data = img_path.read_bytes()
-                mime = self._get_mime(img_path)
-                parts.append(types.Part.from_bytes(data=data, mime_type=mime))
+                parts.append(types.Part.from_bytes(data=img_path.read_bytes(), mime_type=self._get_mime(img_path)))
             except Exception as e:
                 logger.error(f"Failed to read image {img_path}: {e}")
 
-        max_retries = 5
-        for attempt in range(max_retries):
+        for attempt in range(5):
             try:
                 response = self.client.models.generate_content(
                     model=self.model,
@@ -76,25 +72,21 @@ class GeminiVisionClient:
                     ),
                 )
                 time.sleep(2)
-                break
+                return self._parse_response(response, image_paths)
             except Exception as e:
                 err_str = str(e)
                 if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str:
                     wait = 2 ** attempt * 5
-                    logger.warning(f"Rate limited, retrying in {wait}s (attempt {attempt+1}/{max_retries})")
+                    logger.warning(f"Rate limited, retrying in {wait}s (attempt {attempt + 1}/5)")
                     time.sleep(wait)
-                else:
-                    logger.error(f"Gemini API call failed: {e}")
-                    return self._empty_analysis(f"API error: {str(e)[:100]}")
-        else:
-            logger.error("Max retries exceeded for Gemini API")
-            return self._empty_analysis("API rate limit exceeded after retries")
+                    continue
+                logger.error(f"Gemini API call failed: {e}")
+                return self._empty_analysis(f"API error: {str(e)[:100]}")
 
-        return self._parse_response(response, image_paths)
+        return self._empty_analysis("API rate limit exceeded after retries")
 
     def _parse_response(self, response, image_paths: List[Path]) -> Dict[str, Any]:
         text = response.text if hasattr(response, "text") and response.text else ""
-
         if not text:
             return self._empty_analysis("Empty response from Gemini")
 
@@ -104,11 +96,7 @@ class GeminiVisionClient:
                 json_str = json_match.group(1)
             else:
                 json_match = re.search(r"\{[\s\S]*\}", text)
-                if json_match:
-                    json_str = json_match.group(0)
-                else:
-                    json_str = text
-
+                json_str = json_match.group(0) if json_match else text
             analysis = json.loads(json_str)
         except (json.JSONDecodeError, ValueError) as e:
             logger.error(f"Failed to parse JSON from Gemini response: {e}")
@@ -116,53 +104,130 @@ class GeminiVisionClient:
 
         return self._normalize_analysis(analysis, image_paths)
 
-    def _normalize_analysis(self, analysis: Dict, image_paths: List[Path]) -> Dict[str, Any]:
+    def _normalize_analysis(self, analysis: Dict[str, Any], image_paths: List[Path]) -> Dict[str, Any]:
         image_ids = [get_image_id_from_path(p) for p in image_paths]
+        raw = analysis.get("per_image_assessments", analysis.get("image_assessments", []))
+        raw = raw if isinstance(raw, list) else []
 
-        default = {
-            "image_assessments": [],
-            "overall_issue_type": "unknown",
-            "overall_object_part": "unknown",
-            "claim_supported": False,
-            "supporting_image_ids": [],
-            "contradiction_reason": None,
-            "severity": "unknown",
-            "confidence": 0.0,
-            "notes": "",
+        assessments = []
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                continue
+            image_id = item.get("image_id") or (image_ids[idx] if idx < len(image_ids) else "")
+            damage_type = self._enum(item.get("damage_type") or self._first(item.get("issues_visible")), "unknown")
+            object_part = self._enum(item.get("object_part") or self._first(item.get("affected_parts")), "unknown")
+            is_clear = self._to_bool(item.get("is_clear", True))
+            is_cropped = self._to_bool(item.get("is_cropped", False))
+            lighting = self._to_bool(item.get("lighting_adequate", True))
+            angle = self._to_bool(item.get("angle_sufficient", True))
+            damage_visible = self._to_bool(item.get("damage_visible", damage_type not in ("none", "unknown")))
+
+            if image_id not in image_ids:
+                continue
+
+            assessments.append({
+                "image_id": image_id,
+                "damage_visible": damage_visible,
+                "damage_type": damage_type,
+                "object_part": object_part,
+                "image_quality": self._quality_label(item.get("image_quality"), is_clear, is_cropped, lighting, angle),
+                "is_clear": is_clear,
+                "is_cropped": is_cropped,
+                "lighting_adequate": lighting,
+                "angle_sufficient": angle,
+                "issues_visible": item.get("issues_visible", [damage_type] if damage_visible else ["none"]),
+                "affected_parts": item.get("affected_parts", [object_part] if object_part != "unknown" else []),
+                "damage_description": item.get("damage_description", ""),
+                "confidence": self._to_float(item.get("confidence", analysis.get("confidence", 0.0))),
+            })
+
+        aggregate = self._aggregate(analysis, assessments, image_ids)
+        aggregate["per_image_assessments"] = assessments
+
+        # Backward-compatible aliases for existing helpers and reports.
+        aggregate["image_assessments"] = assessments
+        aggregate["overall_issue_type"] = aggregate["damage_type"]
+        aggregate["overall_object_part"] = aggregate["object_part"]
+        aggregate["supporting_image_ids"] = aggregate["supporting_images"]
+        return aggregate
+
+    def _aggregate(self, analysis: Dict[str, Any], assessments: List[Dict[str, Any]], image_ids: List[str]) -> Dict[str, Any]:
+        clear_damage = [
+            a for a in assessments
+            if a["damage_visible"] and a["is_clear"] and a["angle_sufficient"]
+        ]
+        any_damage = [a for a in assessments if a["damage_visible"]]
+        evidence_pool = clear_damage or any_damage
+
+        damage_visible = bool(evidence_pool)
+        damage_type = self._majority(evidence_pool, "damage_type") if damage_visible else "none"
+        object_part = self._majority(evidence_pool, "object_part") if damage_visible else self._enum(analysis.get("object_part"), "unknown")
+        supporting = [
+            a["image_id"] for a in evidence_pool
+            if a["image_id"] in image_ids and a["damage_type"] == damage_type
+        ]
+        if not supporting and isinstance(analysis.get("supporting_images"), list):
+            supporting = [img for img in analysis["supporting_images"] if img in image_ids]
+
+        confidence_values = [a["confidence"] for a in evidence_pool if a["confidence"] > 0]
+        confidence = sum(confidence_values) / len(confidence_values) if confidence_values else self._to_float(analysis.get("confidence"))
+
+        return {
+            "damage_visible": damage_visible,
+            "damage_type": damage_type or "unknown",
+            "object_part": object_part or "unknown",
+            "image_quality": self._aggregate_quality(assessments),
+            "supporting_images": supporting,
+            "confidence": confidence,
+            "notes": analysis.get("notes", ""),
+            "conflicting_images": self._has_conflicts(assessments),
         }
 
-        result = default.copy()
-        for key in default:
-            if key in analysis and analysis[key] is not None:
-                result[key] = analysis[key]
+    def _majority(self, assessments: List[Dict[str, Any]], field: str) -> str:
+        counts: Dict[str, int] = {}
+        for assessment in assessments:
+            value = self._enum(assessment.get(field), "unknown")
+            if value != "unknown":
+                counts[value] = counts.get(value, 0) + 1
+        if not counts:
+            return "unknown"
+        return sorted(counts.items(), key=lambda item: (-item[1], item[0]))[0][0]
 
-        if not isinstance(result["image_assessments"], list):
-            result["image_assessments"] = []
+    def _aggregate_quality(self, assessments: List[Dict[str, Any]]) -> str:
+        if not assessments:
+            return "unknown"
+        strong = sum(1 for a in assessments if a["is_clear"] and a["angle_sufficient"] and a["lighting_adequate"])
+        if strong >= max(1, len(assessments) // 2):
+            return "good"
+        if any(a["is_clear"] for a in assessments):
+            return "adequate"
+        return "poor"
 
-        if not isinstance(result["supporting_image_ids"], list):
-            result["supporting_image_ids"] = []
+    def _has_conflicts(self, assessments: List[Dict[str, Any]]) -> bool:
+        damage = {a["damage_type"] for a in assessments if a["damage_visible"] and a["damage_type"] != "unknown"}
+        parts = {a["object_part"] for a in assessments if a["damage_visible"] and a["object_part"] != "unknown"}
+        return len(damage) > 1 or len(parts) > 1
 
-        result["supporting_image_ids"] = [
-            img_id for img_id in result["supporting_image_ids"]
-            if img_id in image_ids
-        ]
+    def _quality_label(self, value: Any, is_clear: bool, is_cropped: bool, lighting: bool, angle: bool) -> str:
+        if not is_clear or is_cropped or not lighting:
+            return "poor"
+        if not angle:
+            return "adequate"
+        value = self._enum(value, "good")
+        return value if value in {"good", "adequate", "poor", "unknown"} else "good"
 
-        result["claim_supported"] = self._to_bool(result.get("claim_supported", False))
+    def _first(self, values: Any) -> str:
+        if isinstance(values, list) and values:
+            return str(values[0])
+        return "unknown"
 
-        for assessment in result["image_assessments"]:
-            for field in ("is_clear", "is_cropped", "lighting_adequate", "angle_sufficient"):
-                if field in assessment:
-                    assessment[field] = self._to_bool(assessment[field])
+    def _enum(self, value: Any, default: str) -> str:
+        if value is None:
+            return default
+        value = str(value).strip().lower()
+        return value or default
 
-        if result["claim_supported"] and not result["supporting_image_ids"]:
-            for assessment in result["image_assessments"]:
-                if assessment.get("is_clear", False) and assessment.get("issues_visible", []):
-                    result["supporting_image_ids"].append(assessment.get("image_id", ""))
-                    break
-
-        return result
-
-    def _to_bool(self, value) -> bool:
+    def _to_bool(self, value: Any) -> bool:
         if isinstance(value, bool):
             return value
         if isinstance(value, str):
@@ -171,25 +236,38 @@ class GeminiVisionClient:
             return value > 0
         return False
 
+    def _to_float(self, value: Any) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
+
     def _empty_analysis(self, reason: str) -> Dict[str, Any]:
         return {
+            "damage_visible": False,
+            "damage_type": "unknown",
+            "object_part": "unknown",
+            "image_quality": "unknown",
+            "supporting_images": [],
+            "confidence": 0.0,
+            "notes": f"Analysis failed: {reason}",
+            "conflicting_images": False,
+            "per_image_assessments": [],
             "image_assessments": [],
             "overall_issue_type": "unknown",
             "overall_object_part": "unknown",
-            "claim_supported": False,
             "supporting_image_ids": [],
-            "contradiction_reason": reason,
-            "severity": "unknown",
-            "confidence": 0.0,
-            "notes": f"Analysis failed: {reason}",
         }
 
     def _get_mime(self, path: Path) -> str:
         ext = path.suffix.lower()
         mime_map = {
-            ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
-            ".png": "image/png", ".gif": "image/gif",
-            ".webp": "image/webp", ".bmp": "image/bmp",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".png": "image/png",
+            ".gif": "image/gif",
+            ".webp": "image/webp",
+            ".bmp": "image/bmp",
         }
         return mime_map.get(ext, "image/jpeg")
 

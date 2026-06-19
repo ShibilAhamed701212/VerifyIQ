@@ -19,9 +19,13 @@ class RiskAnalyzer:
         user_history: Optional[Dict[str, Any]],
         claim_object: str,
         user_claim: str,
+        evidence_result: Optional[Dict[str, Any]] = None,
+        rule_result: Optional[Dict[str, Any]] = None,
     ) -> tuple[List[str], str]:
         risk_flags: Set[str] = set()
         severity = "unknown"
+        evidence_result = evidence_result or {}
+        rule_result = rule_result or {}
 
         image_assessments = image_analysis.get("image_assessments", [])
         for assessment in image_assessments:
@@ -34,10 +38,32 @@ class RiskAnalyzer:
             if not assessment.get("angle_sufficient", True):
                 risk_flags.add("wrong_angle")
 
-        if image_analysis.get("claim_supported") is False:
-            risk_flags.add("claim_mismatch")
+        if not evidence_result.get("evidence_standard_met", True):
+            risk_flags.add("evidence_insufficient")
 
-        if image_analysis.get("overall_issue_type") in ("none", "unknown"):
+        confidence = self._to_float(rule_result.get("confidence", image_analysis.get("confidence", 0.0)))
+        if confidence < 0.50:
+            risk_flags.add("low_confidence")
+
+        mismatch_type = rule_result.get("mismatch_type")
+        if mismatch_type == "object_part_mismatch":
+            risk_flags.add("object_part_mismatch")
+            risk_flags.add("wrong_object_part")
+        elif mismatch_type == "claim_mismatch":
+            risk_flags.add("claim_mismatch")
+        elif mismatch_type == "damage_not_visible":
+            risk_flags.add("damage_not_visible")
+        elif mismatch_type == "evidence_insufficient":
+            risk_flags.add("evidence_insufficient")
+
+        for flag in rule_result.get("risk_flags", []):
+            risk_flags.add(flag)
+
+        if image_analysis.get("conflicting_images", False):
+            risk_flags.add("claim_mismatch")
+            risk_flags.add("manual_review_required")
+
+        if image_analysis.get("damage_type", image_analysis.get("overall_issue_type")) in ("none", "unknown"):
             if self._user_claimed_damage(user_claim):
                 risk_flags.add("damage_not_visible")
 
@@ -60,15 +86,17 @@ class RiskAnalyzer:
             if rejected > 2:
                 risk_flags.add("user_history_risk")
 
-        if image_analysis.get("confidence", 1.0) < 0.5:
+        if confidence < 0.5:
             risk_flags.add("manual_review_required")
 
         if "text" in notes or "label" in notes:
             risk_flags.add("text_instruction_present")
 
-        if len(risk_flags) >= 3:
+        if len([flag for flag in risk_flags if flag != "manual_review_required"]) >= 2:
             risk_flags.add("manual_review_required")
         if "claim_mismatch" in risk_flags and "user_history_risk" in risk_flags:
+            risk_flags.add("manual_review_required")
+        if "user_history_risk" in risk_flags:
             risk_flags.add("manual_review_required")
 
         severity = self._determine_severity(image_analysis, user_claim)
@@ -90,7 +118,7 @@ class RiskAnalyzer:
         return any(kw in text for kw in damage_keywords)
 
     def _determine_severity(self, image_analysis: Dict[str, Any], user_claim: str) -> str:
-        issue_type = image_analysis.get("overall_issue_type", "unknown")
+        issue_type = image_analysis.get("damage_type", image_analysis.get("overall_issue_type", "unknown"))
 
         severity_map = {
             "dent": "low",
@@ -111,3 +139,9 @@ class RiskAnalyzer:
             return mapped
 
         return image_analysis.get("severity", "unknown")
+
+    def _to_float(self, value: Any) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
