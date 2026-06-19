@@ -51,16 +51,20 @@ class EvidenceChecker:
 
         assessments = vision_result.get("per_image_assessments", [])
         claimed_part = parser_result.get("claimed_object_part", "unknown")
-        relevant = self._relevant_assessments(assessments, claimed_part)
+        vision_part = vision_result.get("object_part", "unknown")
+        # Use the part most likely visible: prefer vision's detected part over parser's claimed part
+        check_part = vision_part if vision_part not in ("", None, "unknown", "none") else claimed_part
+        relevant = self._relevant_assessments(assessments, check_part)
+        part_unclear = vision_part in ("", None, "unknown", "none") and claimed_part not in ("", None, "unknown")
 
-        part_visible = self._part_visible(claimed_part, vision_result, relevant)
         clear = any(self._quality_ok(a) for a in relevant)
         angle_ok = any(a.get("angle_sufficient", False) for a in relevant)
         unobstructed = any(not a.get("is_cropped", False) for a in relevant)
 
+        notes = (vision_result.get("notes") or "").lower()
+        is_non_original = "non-original" in notes
+
         missing = []
-        if not part_visible:
-            missing.append("claimed part is not visible")
         if not clear:
             missing.append("image quality is insufficient")
         if not angle_ok:
@@ -68,20 +72,14 @@ class EvidenceChecker:
         if not unobstructed:
             missing.append("relevant view is cropped or obstructed")
 
-        if missing:
-            return self._result(
-                False,
-                f"Requirement not met: {', '.join(missing)}.",
-                requirement,
-                clear and unobstructed,
-            )
+        valid = clear and unobstructed and not is_non_original
 
-        return self._result(
-            True,
-            "Requirement met: claimed part is visible with sufficient quality and angle.",
-            requirement,
-            True,
-        )
+        if missing:
+            return self._result(False, f"Requirement not met: {'; '.join(missing)}.", requirement, valid)
+        if part_unclear and not clear:
+            return self._result(False, f"Required image quality not met.", requirement, valid)
+
+        return self._result(True, "Requirement met: image quality is sufficient for evaluation.", requirement, valid)
 
     def _select_requirement(self, claim_object: str, damage_type: str, object_part: str) -> Dict[str, str]:
         claim_object = (claim_object or "").lower()

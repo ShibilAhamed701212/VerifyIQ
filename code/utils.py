@@ -71,6 +71,19 @@ def extract_claim_text(user_claim: str) -> str:
     if not user_claim:
         return ""
 
+    # Handle pipe-separated "Customer: ... | Support: ... | Customer: ..." format
+    if " | " in user_claim:
+        parts = user_claim.split(" | ")
+        customer_lines = []
+        for part in parts:
+            part = part.strip()
+            if part.lower().startswith("customer:"):
+                customer_lines.append(part[9:].strip())
+        if customer_lines:
+            return customer_lines[-1]
+        return parts[-1].strip()
+
+    # Handle multi-line "User: / Agent:" format
     lines = user_claim.split("\n")
     claim_lines = []
     for line in lines:

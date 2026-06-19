@@ -26,11 +26,14 @@ class GeminiVisionClient:
 
     def __init__(self, config: Config):
         self.config = config
-        api_key = config.api_key or os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY must be set in environment or config.")
-        self.client = genai.Client(api_key=api_key)
+        self.client = None
         self.model = config.vision_model
+        api_key = config.api_key or os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            try:
+                self.client = genai.Client(api_key=api_key)
+            except Exception as e:
+                logger.warning(f"Gemini client init failed: {e}")
 
     def analyze_images(
         self,
@@ -39,6 +42,8 @@ class GeminiVisionClient:
         claim_object: str,
         object_parts: List[str],
     ) -> Dict[str, Any]:
+        if self.client is None:
+            return self._empty_analysis("Gemini client not available (no API key).")
         if not image_paths:
             return self._empty_analysis("No images provided.")
 

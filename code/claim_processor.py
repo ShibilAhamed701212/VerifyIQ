@@ -91,6 +91,7 @@ class ClaimProcessor:
                 user_claim=user_claim,
                 evidence_result=evidence_result,
                 rule_result=rule_result,
+                image_paths=image_paths,
             )
 
             return self.decision_agent.build_output_row(

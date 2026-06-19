@@ -50,6 +50,9 @@ def compare_outputs(predicted: Dict, expected: Dict) -> Dict[str, Any]:
     for field in compare_fields:
         pred_val = predicted.get(field, "")
         exp_val = expected.get(field, "")
+        if field == "risk_flags":
+            pred_val = _normalize_flags(pred_val)
+            exp_val = _normalize_flags(exp_val)
         if pred_val != exp_val:
             results["match"] = False
             results["differences"].append({

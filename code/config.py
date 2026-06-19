@@ -32,7 +32,7 @@ class Config:
     image_support_threshold: float = 0.5
 
     # --- Evaluation ---
-    evaluation_samples_limit: int = 10
+    evaluation_samples_limit: int = -1
 
     # --- Risk Flags ---
     risk_flag_indicators: dict = field(default_factory=lambda: {
@@ -49,9 +49,9 @@ class Config:
         "text_instruction_present": ["text in image", "label", "note", "instruction"],
         "user_history_risk": [],
         "manual_review_required": [],
-        "evidence_insufficient": [],
-        "low_confidence": [],
-        "object_part_mismatch": [],
+        "evidence_insufficient": ["insufficient evidence", "not enough evidence"],
+        "low_confidence": ["low confidence", "uncertain"],
+        "object_part_mismatch": ["wrong part", "different part"],
     })
 
     ALLOWED_ISSUE_TYPES = {
@@ -78,6 +78,5 @@ class Config:
         "damage_not_visible", "claim_mismatch", "possible_manipulation",
         "non_original_image", "text_instruction_present",
         "user_history_risk", "manual_review_required",
-        "evidence_insufficient", "low_confidence", "object_part_mismatch",
         "none"
     }

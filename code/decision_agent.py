@@ -34,6 +34,8 @@ class DecisionAgent:
         severity = self.severity_engine.determine(
             vision_result.get("damage_type", "unknown"),
             claim_row.get("user_claim", ""),
+            claim_row.get("claim_object", "").lower(),
+            risk_flags,
         )
         justification = self._reasoning_trace(parser_result, vision_result, evidence_result, rule_result, risk_flags)
 
@@ -79,17 +81,14 @@ class DecisionAgent:
         rule_result: Dict[str, Any],
         vision_result: Dict[str, Any],
     ) -> List[str]:
-        flags = {flag for flag in risk_flags if flag and flag != "none"}
-        flags.update(rule_result.get("risk_flags", []))
+        internal = {"evidence_insufficient", "low_confidence", "object_part_mismatch"}
+        flags = {flag for flag in risk_flags if flag and flag != "none" and flag not in internal}
 
         if rule_result.get("review_candidate"):
             flags.add("manual_review_required")
         if vision_result.get("conflicting_images"):
             flags.add("manual_review_required")
             flags.add("claim_mismatch")
-
-        if len([flag for flag in flags if flag != "manual_review_required"]) >= 2:
-            flags.add("manual_review_required")
 
         return sorted(flags)
 
