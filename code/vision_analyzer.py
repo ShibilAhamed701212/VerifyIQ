@@ -28,12 +28,52 @@ class GeminiVisionClient:
         self.config = config
         self.client = None
         self.model = config.vision_model
+        self.cache_dir = None
         api_key = config.api_key or os.environ.get("GEMINI_API_KEY")
         if api_key:
             try:
                 self.client = genai.Client(api_key=api_key)
             except Exception as e:
                 logger.warning(f"Gemini client init failed: {e}")
+
+    def _init_cache(self) -> None:
+        if self.cache_dir is not None:
+            return
+        self.cache_dir = Path(self.config.base_dir).parent / ".gemini_cache"
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Gemini cache enabled at {self.cache_dir}")
+
+    def _cache_key(self, image_paths: List[Path], user_claim: str, claim_object: str) -> str:
+        import hashlib
+        parts = [str(p.resolve()) for p in sorted(image_paths, key=lambda x: str(x))]
+        parts.append(user_claim[:200])
+        parts.append(claim_object)
+        parts.append(self.model)
+        raw = "|".join(parts)
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
+
+    def _cache_load(self, key: str) -> Dict[str, Any]:
+        if self.cache_dir is None:
+            return None
+        path = self.cache_dir / f"{key}.json"
+        if not path.exists():
+            return None
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            logger.info(f"Cache HIT for {key}")
+            return data
+        except Exception as e:
+            logger.warning(f"Cache read failed for {key}: {e}")
+        return None
+
+    def _cache_save(self, key: str, analysis: Dict[str, Any]) -> None:
+        if self.cache_dir is None:
+            return
+        path = self.cache_dir / f"{key}.json"
+        try:
+            path.write_text(json.dumps(analysis, indent=2), encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Cache write failed for {key}: {e}")
 
     def analyze_images(
         self,
@@ -46,6 +86,12 @@ class GeminiVisionClient:
             return self._empty_analysis("Gemini client not available (no API key).")
         if not image_paths:
             return self._empty_analysis("No images provided.")
+
+        self._init_cache()
+        cache_key = self._cache_key(image_paths, user_claim, claim_object)
+        cached = self._cache_load(cache_key)
+        if cached is not None:
+            return cached
 
         from prompts import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 
@@ -77,7 +123,9 @@ class GeminiVisionClient:
                     ),
                 )
                 time.sleep(2)
-                return self._parse_response(response, image_paths)
+                result = self._parse_response(response, image_paths)
+                self._cache_save(cache_key, result)
+                return result
             except Exception as e:
                 err_str = str(e)
                 if "RESOURCE_EXHAUSTED" in err_str or "429" in err_str:

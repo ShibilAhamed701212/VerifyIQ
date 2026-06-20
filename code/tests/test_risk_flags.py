@@ -30,7 +30,7 @@ class TestRiskFlagsAllowed(unittest.TestCase):
             f"Config has non-standard flags: {extra}")
 
     def test_evidence_insufficient_mapped(self):
-        result, _ = self.analyzer.analyze(
+        result = self.analyzer.analyze(
             image_analysis={},
             user_history=None,
             claim_object="car",
@@ -46,7 +46,7 @@ class TestRiskFlagsAllowed(unittest.TestCase):
         self.assertIn("manual_review_required", result)
 
     def test_low_confidence_mapped(self):
-        result, _ = self.analyzer.analyze(
+        result = self.analyzer.analyze(
             image_analysis={"confidence": 0.3},
             user_history=None,
             claim_object="car",
@@ -62,7 +62,7 @@ class TestRiskFlagsAllowed(unittest.TestCase):
         self.assertIn("manual_review_required", result)
 
     def test_object_part_mismatch_mapped(self):
-        result, _ = self.analyzer.analyze(
+        result = self.analyzer.analyze(
             image_analysis={},
             user_history=None,
             claim_object="car",

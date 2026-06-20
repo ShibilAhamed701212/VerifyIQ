@@ -12,6 +12,7 @@ from typing import List, Dict, Any
 
 from claim_processor import ClaimProcessor
 from config import Config
+from submission_critic import validate_output_rows
 from utils import setup_logging, ensure_output_dir
 
 logger = setup_logging()
@@ -92,6 +93,8 @@ def main() -> None:
                 "severity": "unknown",
             }
             results.append(fallback)
+
+    results = validate_output_rows(results)
 
     write_output(config.output_path, results)
 

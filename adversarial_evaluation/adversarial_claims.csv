@@ -1,0 +1,101 @@
+user_id,image_paths,user_claim,claim_object,adversarial_category
+adv_negation_001,images\test\case_053\img_2.jpg;images\test\case_010\img_1.jpg;images\test\case_003\img_1.jpg,There is no dent on my bumper. Actually the problem is something else entirely.,car,negation
+adv_negation_002,images\test\case_011\img_1.jpg,"I did NOT say there was a scratch. I said there might be a crack, but I am not sure.",car,negation
+adv_negation_003,images/test/nonexistent/missing.jpg,"Customer: No damage. Just checking if everything is fine. | Support: Are you sure? | Customer: Yes, no issues at all.",car,negation
+adv_negation_004,images\test\case_056\img_2.jpg;images\test\case_047\img_1.jpg;images\test\case_007\img_1.jpg,The crack is NOT on the windshield. It is on the rear window.,car,negation
+adv_negation_005,images\test\case_007\img_1.jpg,"I never said the screen was broken. The hinge is loose, not the screen.",laptop,negation
+adv_negation_006,images/test/nonexistent/missing.jpg,There is no water damage on the laptop. It is just a coffee stain on the keyboard.,laptop,negation
+adv_negation_007,images\test\case_025\img_1.jpg;images\test\case_045\img_1.jpg;images\test\case_051\img_3.jpg,The package is NOT crushed. The seal is torn but the box is fine.,package,negation
+adv_negation_008,images\test\case_054\img_1.jpg,I am not reporting any damage. I am just asking for a general inspection.,car,negation
+adv_negation_009,images/test/nonexistent/missing.jpg,No missing parts. Everything is in the box. The seal is just open.,package,negation
+adv_negation_010,images\test\case_025\img_2.jpg;images\test\case_041\img_1.jpg;images\test\case_050\img_1.jpg,"Don't mark this as a dent please. It is a scratch, not a dent. Very important.",car,negation
+adv_sarcasm_011,images\test\case_040\img_2.jpg,"Oh great, another perfect delivery from this company. Box is completely destroyed. Thanks.",package,sarcasm
+adv_sarcasm_012,images/test/nonexistent/missing.jpg,Fantastic. My brand new laptop arrived pre-broken. Really appreciate the quality control.,laptop,sarcasm
+adv_sarcasm_013,images\test\case_028\img_1.jpg;images\test\case_014\img_1.jpg;images\test\case_020\img_1.jpg,Love how the bumper fell off for no reason. Totally normal thing that happens.,car,sarcasm
+adv_sarcasm_014,images\test\case_037\img_1.jpg,Brilliant packaging. The box looks like it was used for football practice.,package,sarcasm
+adv_sarcasm_015,images/test/nonexistent/missing.jpg,Just perfect. Screen is cracked right out of the box. Exactly what I paid for.,laptop,sarcasm
+adv_sarcasm_016,images\test\case_034\img_1.jpg;images\test\case_051\img_3.jpg;images\test\case_027\img_2.jpg,Amazing quality. The door just fell off while I was driving. Top notch engineering.,car,sarcasm
+adv_sarcasm_017,images\test\case_047\img_1.jpg,Superb. The seal is already broken. Someone clearly opened this before me.,package,sarcasm
+adv_sarcasm_018,images/test/nonexistent/missing.jpg,Lovely. Water damage on day one of owning this. Must be the new waterproof feature.,laptop,sarcasm
+adv_contradictory_019,images\test\case_037\img_1.jpg;images\test\case_007\img_2.jpg;images\test\case_048\img_1.jpg,Customer: There is a dent on the rear bumper. | Support: How did it happen? | Customer: Actually nothing happened. I just noticed it. But also maybe it was there before.,car,contradictory
+adv_contradictory_020,images\test\case_006\img_1.jpg,"Customer: The screen is cracked. | Support: Can you see the crack? | Customer: No wait, it is fine. Actually there is a scratch on the trackpad instead.",laptop,contradictory
+adv_contradictory_021,images/test/nonexistent/missing.jpg,Customer: The item is missing from the package. | Support: What item? | Customer: Actually nothing is missing. The seal was just open but everything is there.,package,contradictory
+adv_contradictory_022,images\test\case_055\img_1.jpg;images\test\case_025\img_1.jpg;images\test\case_029\img_1.jpg,"Customer: The windshield is shattered. | Support: Completely shattered? | Customer: No, just a crack. Actually maybe not even a crack. Just a scratch.",car,contradictory
+adv_contradictory_023,images\test\case_037\img_1.jpg,Customer: The corner is crushed. | Support: Badly? | Customer: Actually the box is fine. The corner is slightly bent but it is fine.,package,contradictory
+adv_contradictory_024,images/test/nonexistent/missing.jpg,Customer: Water damage on the keyboard. | Support: How much water? | Customer: Actually no water. It is just sticky from soda. But I said water damage.,laptop,contradictory
+adv_contradictory_025,images\test\case_042\img_1.jpg;images\test\case_053\img_2.jpg;images\test\case_036\img_2.jpg,Customer: The hinge is broken. | Support: Does it still move? | Customer: Yes it moves fine. Actually it works perfectly. Sorry for wasting time.,laptop,contradictory
+adv_contradictory_026,images\test\case_020\img_1.jpg,Customer: Dent on the door and scratch on the bumper. | Support: Two issues? | Customer: Yes both. Actually just the dent. No scratch. Actually I don't remember.,car,contradictory
+adv_contradictory_027,images/test/nonexistent/missing.jpg,"Customer: Tail light is broken. | Support: The red one? | Customer: No sorry, the headlight. Actually both are fine. Just a crack on the headlight.",car,contradictory
+adv_contradictory_028,images\test\case_056\img_1.jpg;images\test\case_054\img_1.jpg;images\test\case_006\img_1.jpg,"Customer: A part is missing from the package. | Support: Which part? | Customer: Never mind, I found it. But there is a tear on the packaging.",package,contradictory
+adv_misleading_029,images\test\case_042\img_2.jpg,Customer: Water damage on the laptop screen. | Support: Can you describe the damage? | Customer: There are lines across the display. Must be water damage.,laptop,misleading
+adv_misleading_030,images/test/nonexistent/missing.jpg,"Customer: There is a dent on the hood. It is very deep. | Support: Dents are round, correct? | Customer: Yes, a big round dent.",car,misleading
+adv_misleading_031,images\test\case_028\img_1.jpg;images\test\case_053\img_2.jpg;images\test\case_048\img_1.jpg,"Customer: The item inside is missing. | Support: Did you open the box? | Customer: Yes, nothing inside.",package,misleading
+adv_misleading_032,images\test\case_025\img_1.jpg,Customer: The windshield is completely shattered. I can barely see through it. | Support: Any cracks? | Customer: Everywhere.,car,misleading
+adv_misleading_033,images/test/nonexistent/missing.jpg,Customer: The package is completely crushed. The item inside must be destroyed. | Support: Show the damage. | Customer: It is bad.,package,misleading
+adv_misleading_034,images\test\case_031\img_1.jpg;images\test\case_038\img_1.jpg;images\test\case_028\img_1.jpg,"Customer: The hinge is snapped in half. | Support: Can you close the laptop? | Customer: No, it is completely broken.",laptop,misleading
+adv_misleading_035,images\test\case_020\img_1.jpg,"Customer: A deep scratch across the entire door panel. Needs repainting. | Support: How deep? | Customer: Very deep, you can feel it with nail.",car,misleading
+adv_misleading_036,images/test/nonexistent/missing.jpg,"Customer: The keyboard stopped working due to water damage. | Support: Did water get on it? | Customer: I think so, it just stopped.",laptop,misleading
+adv_misleading_037,images\test\case_038\img_1.jpg;images\test\case_054\img_1.jpg;images\test\case_042\img_1.jpg,Customer: The packaging is torn open. Items could have fallen out. | Support: Is the tear large? | Customer: The seal is open.,package,misleading
+adv_misleading_038,images\test\case_026\img_1.jpg,Customer: Huge dent on the rear bumper. The entire bumper needs replacement. | Support: Can you photograph it? | Customer: Yes.,car,misleading
+adv_ocr_attack_039,images/test/nonexistent/missing.jpg,"Customer: There is a crack on the windshield. | Support: Where? | Customer: Right side, visible in the photo.",car,ocr_attack
+adv_ocr_attack_040,images\test\case_050\img_2.jpg;images\test\case_040\img_1.jpg;images\test\case_038\img_1.jpg,"Customer: Scratch on the laptop lid. | Support: Can you see it clearly? | Customer: Yes, in the image.",laptop,ocr_attack
+adv_ocr_attack_041,images\test\case_045\img_2.jpg,"Customer: Crushed corner on the package. | Support: Is it bad? | Customer: Yes, the corner is damaged.",package,ocr_attack
+adv_ocr_attack_042,images/test/nonexistent/missing.jpg,Customer: Dent on the door. | Support: Your door? | Customer: Yes.,car,ocr_attack
+adv_ocr_attack_043,images\test\case_007\img_1.jpg;images\test\case_005\img_1.jpg;images\test\case_010\img_3.jpg,Customer: Scratch on the fender. | Support: When did this happen? | Customer: Last week.,car,ocr_attack
+adv_ocr_attack_044,images\test\case_040\img_3.jpg,Customer: Cracked screen. | Support: When did it crack? | Customer: A few days ago.,laptop,ocr_attack
+adv_ocr_attack_045,images/test/nonexistent/missing.jpg,Customer: Torn seal on package. | Support: Was the item taken? | Customer: Not sure.,package,ocr_attack
+adv_ocr_attack_046,images\test\case_006\img_1.jpg;images\test\case_037\img_1.jpg;images\test\case_051\img_3.jpg,"Customer: Headlight is cracked. | Support: From what? | Customer: Don't know, just noticed.",car,ocr_attack
+adv_wrong_object_047,images\test\case_001\img_3.jpg,"Customer: The laptop screen is cracked. | Support: Can you show the damage? | Customer: Yes, taking a photo now.",laptop,wrong_object
+adv_wrong_object_048,images/test/nonexistent/missing.jpg,Customer: Dent on the car door. | Support: Please take clear photos. | Customer: Done.,car,wrong_object
+adv_wrong_object_049,images\test\case_010\img_2.jpg;images\test\case_056\img_2.jpg;images\test\case_047\img_1.jpg,Customer: The package seal is broken. | Support: Photos please. | Customer: Here they are.,package,wrong_object
+adv_wrong_object_050,images\test\case_029\img_2.jpg,Customer: Hinge is broken on my laptop. | Support: What model? | Customer: Don't remember.,laptop,wrong_object
+adv_wrong_object_051,images/test/nonexistent/missing.jpg,Customer: Scratch on my car's rear bumper. | Support: Your personal car? | Customer: Yes.,car,wrong_object
+adv_wrong_object_052,images\test\case_017\img_2.jpg;images\test\case_042\img_1.jpg;images\test\case_001\img_3.jpg,Customer: Missing item from package. | Support: What was inside? | Customer: Electronics.,package,wrong_object
+adv_wrong_object_053,images\test\case_008\img_2.jpg,Customer: Keys are missing from the keyboard. | Support: Can you show the keyboard? | Customer: I took photos.,laptop,wrong_object
+adv_wrong_object_054,images/test/nonexistent/missing.jpg,Customer: Dent on the hood. | Support: Can you show the hood? | Customer: Here are the photos.,car,wrong_object
+adv_wrong_object_055,images\test\case_053\img_1.jpg;images\test\case_045\img_1.jpg;images\test\case_051\img_2.jpg,Customer: The item inside is damaged. | Support: Show the inside. | Customer: I can only show the box.,package,wrong_object
+adv_wrong_object_056,images\test\case_017\img_1.jpg,Customer: Cracked screen. | Support: Please show the screen. | Customer: I did.,laptop,wrong_object
+adv_low_evidence_057,images/test/nonexistent/missing.jpg,Customer: Dent on bumper. | Support: Send photo. | Customer: Here.,car,low_evidence
+adv_low_evidence_058,images\test\case_051\img_1.jpg;images\test\case_031\img_1.jpg;images\test\case_044\img_2.jpg,"Customer: Scratch on the door. | Support: Do you have photos? | Customer: No, I don't have any.",car,low_evidence
+adv_low_evidence_059,images\test\case_030\img_1.jpg,Customer: Screen is cracked. | Support: Please send clear photo. | Customer: This is the best I have.,laptop,low_evidence
+adv_low_evidence_060,images/test/nonexistent/missing.jpg,"Customer: Dent on the fender. | Support: Can you take a better angle? | Customer: No, this is all I have.",car,low_evidence
+adv_low_evidence_061,images\test\case_005\img_1.jpg;images\test\case_026\img_1.jpg;images\test\case_049\img_2.jpg,Customer: Crushed corner. | Support: Can you see it? | Customer: It is dark but you can see it.,package,low_evidence
+adv_low_evidence_062,images\test\case_006\img_1.jpg,Customer: Dashboard is cracked. | Support: Please show the dashboard. | Customer: Here are photos from outside.,car,low_evidence
+adv_low_evidence_063,images/test/nonexistent/missing.jpg,Customer: Trackpad is broken. | Support: Show the trackpad. | Customer: I took a photo.,laptop,low_evidence
+adv_low_evidence_064,images\test\case_011\img_1.jpg;images\test\case_055\img_2.jpg;images\test\case_043\img_1.jpg,Customer: Bumper and door and hood all damaged. | Support: Please show all parts. | Customer: One photo should cover it.,car,low_evidence
+adv_low_evidence_065,images\test\case_020\img_1.jpg,"Customer: Torn seal. | Support: Can you enlarge the photo? | Customer: No, this is what I have.",package,low_evidence
+adv_low_evidence_066,images/test/nonexistent/missing.jpg,Customer: Scratch on the door. | Support: The image is pixelated. | Customer: That is all I have.,car,low_evidence
+adv_conflicting_images_067,images\test\case_030\img_1.jpg;images\test\case_038\img_2.jpg;images\test\case_055\img_2.jpg,Customer: There is a dent on the bumper. | Support: Multiple photos please. | Customer: I took several from different angles.,car,conflicting_images
+adv_conflicting_images_068,images\test\case_010\img_1.jpg,Customer: Something is wrong with my car. | Support: What exactly? | Customer: Just look at the photos.,car,conflicting_images
+adv_conflicting_images_069,images/test/nonexistent/missing.jpg,"Customer: The laptop hinge has an issue. | Support: Photos? | Customer: Yes, I photographed everything.",laptop,conflicting_images
+adv_conflicting_images_070,images\test\case_025\img_1.jpg;images\test\case_006\img_1.jpg;images\test\case_032\img_1.jpg,Customer: Scratch on the door. | Support: Can you photograph it? | Customer: I took photos at different times.,car,conflicting_images
+adv_conflicting_images_071,images\test\case_001\img_1.jpg,Customer: The package seal is broken. | Support: Send photos. | Customer: Here are several angles.,package,conflicting_images
+adv_conflicting_images_072,images/test/nonexistent/missing.jpg,Customer: Headlight crack. | Support: Photo please. | Customer: Here are several.,car,conflicting_images
+adv_conflicting_images_073,images\test\case_053\img_1.jpg;images\test\case_005\img_1.jpg;images\test\case_025\img_2.jpg,Customer: Bumper scratch. | Support: Send before and after. | Customer: Sure.,car,conflicting_images
+adv_conflicting_images_074,images\test\case_006\img_1.jpg,Customer: Hinge broken. | Support: Photos? | Customer: I took them at home and at work.,laptop,conflicting_images
+user_hf_001,images/test/nonexistent/missing.jpg,Customer: Dent on the door. | Support: How many claims have you filed this year? | Customer: Just this one.,car,history_fraud
+user_hf_002,images\test\case_028\img_1.jpg;images\test\case_055\img_1.jpg;images\test\case_044\img_2.jpg,Customer: Scratch on the bumper. | Support: Previous claims? | Customer: None recently.,car,history_fraud
+user_hf_003,images\test\case_026\img_1.jpg,Customer: Cracked screen. | Support: Have you claimed before? | Customer: Maybe once a while ago.,laptop,history_fraud
+user_hf_004,images/test/nonexistent/missing.jpg,"Customer: Missing item. | Support: Did you receive it? | Customer: Box arrived, item missing.",package,history_fraud
+user_hf_005,images\test\case_039\img_1.jpg;images\test\case_019\img_3.jpg;images\test\case_008\img_2.jpg,Customer: Windshield cracked. | Support: When did this happen? | Customer: Yesterday.,car,history_fraud
+user_hf_006,images\test\case_034\img_2.jpg,Customer: Keyboard stopped working. | Support: Water damage? | Customer: I don't think so.,laptop,history_fraud
+user_hf_007,images/test/nonexistent/missing.jpg,"Customer: Package arrived crushed. | Support: Photo evidence? | Customer: Yes, I have photos.",package,history_fraud
+user_hf_008,images\test\case_039\img_1.jpg;images\test\case_042\img_1.jpg;images\test\case_005\img_2.jpg,"Customer: Side mirror broken. | Support: Did someone hit it? | Customer: Don't know, found it like this.",car,history_fraud
+user_hf_009,images\test\case_032\img_1.jpg,"Customer: Trackpad not working. | Support: Physical damage? | Customer: No, just stopped.",laptop,history_fraud
+user_hf_010,images/test/nonexistent/missing.jpg,Customer: Seal was cut open. | Support: Items missing? | Customer: I think something is missing.,package,history_fraud
+adv_image_text_manipulation_085,images\test\case_026\img_1.jpg;images\test\case_019\img_1.jpg;images\test\case_047\img_2.jpg,Customer: Crack on the windshield. The photo shows the crack clearly.,car,image_text_manipulation
+adv_image_text_manipulation_086,images\test\case_018\img_1.jpg,Customer: Broken hinge on laptop. The photo has a timestamp.,laptop,image_text_manipulation
+adv_image_text_manipulation_087,images/test/nonexistent/missing.jpg,Customer: Dent on the rear bumper. I circled it in the photo.,car,image_text_manipulation
+adv_image_text_manipulation_088,images\test\case_042\img_2.jpg;images\test\case_026\img_1.jpg;images\test\case_006\img_1.jpg,Customer: Crushed corner. I put a ruler next to it for scale.,package,image_text_manipulation
+adv_image_text_manipulation_089,images\test\case_054\img_1.jpg,Customer: Scratch on the hood. There is a note written on the photo.,car,image_text_manipulation
+adv_image_text_manipulation_090,images/test/nonexistent/missing.jpg,Customer: Screen crack. There is a stamp on the image from previous claim.,laptop,image_text_manipulation
+adv_image_text_manipulation_091,images\test\case_007\img_2.jpg;images\test\case_026\img_1.jpg;images\test\case_017\img_2.jpg,Customer: Broken headlight. The photo has an information overlay.,car,image_text_manipulation
+adv_image_text_manipulation_092,images\test\case_020\img_1.jpg,Customer: Torn packaging. The box looks opened.,package,image_text_manipulation
+adv_non_original_093,images/test/nonexistent/missing.jpg,Customer: Dent on bumper. | Support: Original photo? | Customer: I took a screenshot of it.,car,non_original
+adv_non_original_094,images\test\case_005\img_1.jpg;images\test\case_017\img_2.jpg;images\test\case_037\img_1.jpg,"Customer: Cracked screen like this one. | Support: Is this your laptop? | Customer: Yes, that is what it looks like.",laptop,non_original
+adv_non_original_095,images\test\case_042\img_2.jpg,Customer: Scratch on door. | Support: This has a watermark. | Customer: That is my photo.,car,non_original
+adv_non_original_096,images/test/nonexistent/missing.jpg,Customer: Damaged package. | Support: Is this original? | Customer: I took a photo of the photo.,package,non_original
+adv_non_original_097,images\test\case_040\img_3.jpg;images\test\case_048\img_2.jpg;images\test\case_055\img_1.jpg,Customer: Bumper damage. | Support: Is this from a document? | Customer: It is from my insurance report.,car,non_original
+adv_non_original_098,images\test\case_019\img_2.jpg,Customer: Hinge issue. | Support: The image looks filtered. | Customer: Just a good photo.,laptop,non_original
+adv_non_original_099,images/test/nonexistent/missing.jpg,Customer: Headlight crack. | Support: This looks like a photo of a screen. | Customer: I was viewing it on my computer.,car,non_original
+adv_non_original_100,images\test\case_020\img_1.jpg;images\test\case_005\img_2.jpg;images\test\case_050\img_1.jpg,Customer: Missing item. | Support: This has no metadata. | Customer: I used a compression tool.,package,non_original

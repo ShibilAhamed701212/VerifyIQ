@@ -3,7 +3,7 @@ Configuration and constants for the evidence review system.
 """
 
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 
@@ -33,26 +33,6 @@ class Config:
 
     # --- Evaluation ---
     evaluation_samples_limit: int = -1
-
-    # --- Risk Flags ---
-    risk_flag_indicators: dict = field(default_factory=lambda: {
-        "blurry_image": ["blurry", "blur", "unclear", "low resolution"],
-        "cropped_or_obstructed": ["cropped", "cut off", "obstructed", "blocked", "partial"],
-        "low_light_or_glare": ["dark", "low light", "glare", "overexposed", "underexposed"],
-        "wrong_angle": ["wrong angle", "side view", "not directly"],
-        "wrong_object": ["wrong object", "different", "not a"],
-        "wrong_object_part": ["wrong part", "not the", "different part"],
-        "damage_not_visible": ["no damage", "undamaged", "pristine"],
-        "claim_mismatch": ["mismatch", "inconsistent", "doesn't match"],
-        "possible_manipulation": ["photoshopped", "edited", "manipulated", "altered"],
-        "non_original_image": ["screenshot", "stock", "template"],
-        "text_instruction_present": ["text in image", "label", "note", "instruction"],
-        "user_history_risk": [],
-        "manual_review_required": [],
-        "evidence_insufficient": ["insufficient evidence", "not enough evidence"],
-        "low_confidence": ["low confidence", "uncertain"],
-        "object_part_mismatch": ["wrong part", "different part"],
-    })
 
     ALLOWED_ISSUE_TYPES = {
         "dent", "scratch", "crack", "glass_shatter", "broken_part",

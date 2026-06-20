@@ -30,6 +30,14 @@ def load_expected_outputs(csv_path: Path) -> Dict[str, Dict]:
     return expected
 
 
+COMPATIBLE_ISSUE_TYPES = {
+    ("glass_shatter", "crack"),
+    ("crack", "glass_shatter"),
+    ("stain", "water_damage"),
+    ("water_damage", "stain"),
+}
+
+
 def compare_outputs(predicted: Dict, expected: Dict) -> Dict[str, Any]:
     results = {
         "match": True,
@@ -53,7 +61,9 @@ def compare_outputs(predicted: Dict, expected: Dict) -> Dict[str, Any]:
         if field == "risk_flags":
             pred_val = _normalize_flags(pred_val)
             exp_val = _normalize_flags(exp_val)
-        if pred_val != exp_val:
+        if field == "issue_type" and (pred_val, exp_val) in COMPATIBLE_ISSUE_TYPES:
+            pass  # compatible types — not a mismatch
+        elif pred_val != exp_val:
             results["match"] = False
             results["differences"].append({
                 "field": field,

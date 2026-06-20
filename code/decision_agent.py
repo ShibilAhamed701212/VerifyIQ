@@ -5,7 +5,7 @@ This is the only component that produces the final output row returned to
 `main.py` and ultimately written to `output.csv`.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from output_validator import OutputValidator
 from severity_engine import SeverityEngine
@@ -25,9 +25,9 @@ class DecisionAgent:
         vision_result: Dict[str, Any],
         evidence_result: Dict[str, Any],
         rule_result: Dict[str, Any],
-        risk_result: Tuple[List[str], str],
+        risk_result: List[str],
     ) -> Dict[str, str]:
-        risk_flags, _legacy_severity = risk_result
+        risk_flags = risk_result
         risk_flags = self._merge_flags(risk_flags, rule_result, vision_result)
 
         status = rule_result.get("claim_status", "not_enough_information")

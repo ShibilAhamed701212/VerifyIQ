@@ -12,7 +12,6 @@ class RiskAnalyzer:
 
     def __init__(self, config: Config):
         self.config = config
-        self.risk_indicators = config.risk_flag_indicators
         self._blur_detector = None
         self._crop_detector = None
         self._text_detector = None
@@ -39,9 +38,8 @@ class RiskAnalyzer:
         evidence_result: Optional[Dict[str, Any]] = None,
         rule_result: Optional[Dict[str, Any]] = None,
         image_paths: Optional[List[Path]] = None,
-    ) -> tuple[List[str], str]:
+    ) -> List[str]:
         risk_flags: Set[str] = set()
-        severity = "unknown"
         evidence_result = evidence_result or {}
         rule_result = rule_result or {}
 
@@ -148,15 +146,13 @@ class RiskAnalyzer:
         if "user_history_risk" in risk_flags:
             risk_flags.add("manual_review_required")
 
-        severity = self._determine_severity(image_analysis, user_claim)
-
         internal_flags = {"evidence_insufficient", "low_confidence", "object_part_mismatch"}
         risk_flags = {f for f in risk_flags if f not in internal_flags}
 
         if not risk_flags:
-            return ["none"], severity
+            return ["none"]
 
-        return sorted(risk_flags), severity
+        return sorted(risk_flags)
 
     def _user_claimed_damage(self, user_claim: str) -> bool:
         if not user_claim:
@@ -168,29 +164,6 @@ class RiskAnalyzer:
             "defect", "problem", "not working", "faulty"
         ]
         return any(kw in text for kw in damage_keywords)
-
-    def _determine_severity(self, image_analysis: Dict[str, Any], user_claim: str) -> str:
-        issue_type = image_analysis.get("damage_type", image_analysis.get("overall_issue_type", "unknown"))
-
-        severity_map = {
-            "dent": "low",
-            "scratch": "low",
-            "crack": "medium",
-            "glass_shatter": "high",
-            "broken_part": "medium",
-            "missing_part": "medium",
-            "torn_packaging": "low",
-            "crushed_packaging": "medium",
-            "water_damage": "high",
-            "stain": "low",
-            "none": "none",
-        }
-
-        mapped = severity_map.get(issue_type)
-        if mapped:
-            return mapped
-
-        return image_analysis.get("severity", "unknown")
 
     def _to_float(self, value: Any) -> float:
         try:

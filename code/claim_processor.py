@@ -17,6 +17,8 @@ from output_validator import OutputValidator
 from risk_analyzer import RiskAnalyzer
 from rule_engine import RuleEngine
 from severity_engine import SeverityEngine
+from image_preprocessor import normalize_images
+from image_validator import validate_images, any_valid_images, all_images_valid
 from utils import extract_claim_text, parse_image_paths, safe_csv_read
 from vision_analyzer import analyze_images
 
@@ -59,7 +61,28 @@ class ClaimProcessor:
         claim_object = claim_row.get("claim_object", "").strip().lower()
 
         image_paths = parse_image_paths(image_paths_str, self.config.images_dir)
-        parser_result = self.claim_parser.parse(user_claim, claim_object)
+
+        try:
+            image_paths = normalize_images(image_paths)
+        except Exception as e:
+            logger.warning(f"Image normalization failed for {user_id}: {e}")
+
+        try:
+            validation_results = validate_images(image_paths)
+            if not any_valid_images(validation_results):
+                logger.warning(f"No valid images for {user_id}")
+            elif not all_images_valid(validation_results):
+                invalid = [r["image_path"] for r in validation_results if not r["valid"]]
+                logger.warning(f"Some images invalid for {user_id}: {invalid}")
+        except Exception as e:
+            logger.warning(f"Image validation failed for {user_id}: {e}")
+
+        try:
+            parser_result = self.claim_parser.parse(user_claim, claim_object)
+        except Exception as e:
+            logger.error(f"Claim parser failed for {user_id}: {e}")
+            parser_result = {"claimed_damage_type": "unknown", "claimed_object_part": "unknown", "claim_text": user_claim}
+
         user_history = self._get_user_history(user_id)
         claim_text = extract_claim_text(user_claim) or user_claim
 
@@ -70,20 +93,32 @@ class ClaimProcessor:
                 claim_object=claim_object,
                 config=self.config,
             )
+        except Exception as e:
+            logger.error(f"Vision analysis failed for {user_id}: {e}")
+            vision_result = self._empty_vision_result(f"Vision component error: {str(e)[:100]}")
 
+        try:
             evidence_result = self.evidence_checker.evaluate(
                 claim_object=claim_object,
                 parser_result=parser_result,
                 vision_result=vision_result,
                 total_images=len(image_paths),
             )
+        except Exception as e:
+            logger.error(f"Evidence checker failed for {user_id}: {e}")
+            evidence_result = {"evidence_standard_met": False, "evidence_standard_met_reason": f"Evidence evaluation error: {str(e)[:100]}", "reason": f"Evidence evaluation error: {str(e)[:100]}", "requirement_text": "", "valid_image": False}
 
+        try:
             rule_result = self.rule_engine.evaluate(
                 parser_result=parser_result,
                 vision_result=vision_result,
                 evidence_result=evidence_result,
             )
+        except Exception as e:
+            logger.error(f"Rule engine failed for {user_id}: {e}")
+            rule_result = {"claim_status": "not_enough_information", "justification": f"Rule engine error: {str(e)[:100]}", "claimed_damage_type": parser_result.get("claimed_damage_type", "unknown"), "claimed_object_part": parser_result.get("claimed_object_part", "unknown"), "visible_damage_type": vision_result.get("damage_type", "unknown"), "visible_object_part": vision_result.get("object_part", "unknown"), "confidence": 0.0, "review_candidate": False, "mismatch_type": "evidence_insufficient", "risk_flags": []}
 
+        try:
             risk_result = self.risk_analyzer.analyze(
                 image_analysis=vision_result,
                 user_history=user_history,
@@ -93,7 +128,11 @@ class ClaimProcessor:
                 rule_result=rule_result,
                 image_paths=image_paths,
             )
+        except Exception as e:
+            logger.error(f"Risk analyzer failed for {user_id}: {e}")
+            risk_result = ["manual_review_required"]
 
+        try:
             return self.decision_agent.build_output_row(
                 claim_row=claim_row,
                 parser_result=parser_result,
@@ -102,10 +141,20 @@ class ClaimProcessor:
                 rule_result=rule_result,
                 risk_result=risk_result,
             )
-
         except Exception as e:
-            logger.error(f"Processing failed for user {user_id}: {e}", exc_info=True)
+            logger.error(f"Decision agent build failed for {user_id}: {e}", exc_info=True)
             return self.decision_agent.fallback_output(claim_row, str(e))
 
     def _fallback_output(self, claim_row: Dict[str, str], error_message: str) -> Dict[str, str]:
         return self.decision_agent.fallback_output(claim_row, error_message)
+
+    @staticmethod
+    def _empty_vision_result(reason: str) -> Dict[str, Any]:
+        return {
+            "damage_visible": False, "damage_type": "unknown", "object_part": "unknown",
+            "image_quality": "unknown", "supporting_images": [], "confidence": 0.0,
+            "notes": reason, "conflicting_images": False,
+            "per_image_assessments": [], "image_assessments": [],
+            "overall_issue_type": "unknown", "overall_object_part": "unknown",
+            "supporting_image_ids": [],
+        }

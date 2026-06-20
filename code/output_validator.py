@@ -1,14 +1,17 @@
 """
-Output schema and enum validation.
+Output schema and enum validation with consistency checks.
 """
 
-from typing import Any, Dict
+import logging
+from typing import Any, Dict, Set
 
 from config import Config
 
+logger = logging.getLogger("evidence_review.output_validator")
+
 
 class OutputValidator:
-    """Ensures no invalid enum values reach output.csv."""
+    """Ensures no invalid enum values reach output.csv and catches contradictions."""
 
     FIELDNAMES = [
         "user_id",
@@ -50,7 +53,7 @@ class OutputValidator:
             cleaned["severity"] = "unknown"
 
         for bool_field in ("evidence_standard_met", "valid_image"):
-            cleaned[bool_field] = "true" if str(cleaned[bool_field]).lower() == "true" else "false"
+            cleaned[bool_field] = "true" if str(cleaned[bool_field]).lower() in ("true", "yes", "y", "1") else "false"
 
         flags = [f for f in cleaned["risk_flags"].split(";") if f]
         valid_flags = [f for f in flags if f in self.config.ALLOWED_RISK_FLAGS and f != "none"]
@@ -59,4 +62,42 @@ class OutputValidator:
         if not cleaned["supporting_image_ids"]:
             cleaned["supporting_image_ids"] = "none"
 
-        return cleaned
+        return self._consistency_check(cleaned)
+
+    def _consistency_check(self, row: Dict[str, str]) -> Dict[str, str]:
+        status = row.get("claim_status", "")
+        issue_type = row.get("issue_type", "")
+        flags = self._parse_flags(row.get("risk_flags", ""))
+        changed = False
+
+        if status == "supported" and issue_type in ("none", "unknown", ""):
+            row["claim_status"] = "contradicted" if issue_type == "none" else "not_enough_information"
+            row["claim_status_justification"] = (
+                row.get("claim_status_justification", "")
+                + f" [Consistency: status={status} incompatible with issue_type={issue_type}]"
+            )
+            logger.info(f"Consistency fix: user={row.get('user_id')} status={status}->{row['claim_status']} (issue={issue_type})")
+            changed = True
+
+        if status == "contradicted" and row.get("issue_type", "unknown") not in ("none", "unknown", ""):
+            if row.get("evidence_standard_met", "false").lower() != "true":
+                row["claim_status"] = "not_enough_information"
+                row["claim_status_justification"] = (
+                    row.get("claim_status_justification", "")
+                    + " [Consistency: contradicted but evidence not met]"
+                )
+                logger.info(f"Consistency fix: user={row.get('user_id')} contradicted->not_enough_information (evidence not met)")
+                changed = True
+
+        critical = {"possible_manipulation", "non_original_image", "user_history_risk"}
+        if flags & critical and "manual_review_required" not in flags:
+            flags.add("manual_review_required")
+            row["risk_flags"] = ";".join(sorted(flags))
+            changed = True
+
+        if changed:
+            pass
+        return row
+
+    def _parse_flags(self, raw: str) -> Set[str]:
+        return {f.strip() for f in raw.split(";") if f.strip() and f.strip() != "none"}

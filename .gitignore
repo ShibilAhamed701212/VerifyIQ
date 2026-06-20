@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 .env
+output.csv
+.gemini_cache/
+.DS_Store
+adversarial_evaluation/adversarial_results.csv
+adversarial_evaluation/adversarial_summary.json
