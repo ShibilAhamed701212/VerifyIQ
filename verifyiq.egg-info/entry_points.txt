@@ -1,0 +1,2 @@
+[console_scripts]
+verifyiq = verifyiq.__main__:main

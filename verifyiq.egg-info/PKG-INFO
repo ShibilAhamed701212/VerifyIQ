@@ -1,4 +1,47 @@
-# VerifyIQ — AI Agent Framework for Claim Verification
+Metadata-Version: 2.4
+Name: verifyiq
+Version: 0.1.0.dev0
+Summary: Multi-modal claim verification platform
+Author: VerifyIQ Contributors
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/verifyiq/verifyiq
+Project-URL: Documentation, https://github.com/verifyiq/verifyiq
+Project-URL: Source, https://github.com/verifyiq/verifyiq
+Project-URL: Issues, https://github.com/verifyiq/verifyiq/issues
+Keywords: multimodal,claim-verification,fraud-detection,vlm,insurance,explainable-ai,computer-vision
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Security
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: Pillow>=10.0.0
+Requires-Dist: tqdm>=4.65.0
+Provides-Extra: v1
+Provides-Extra: v2
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=5.0.0; extra == "dev"
+Requires-Dist: ruff>=0.3.0; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: mkdocs>=1.5.0; extra == "docs"
+Requires-Dist: mkdocs-material>=9.5.0; extra == "docs"
+Provides-Extra: api
+Requires-Dist: fastapi>=0.110.0; extra == "api"
+Requires-Dist: uvicorn>=0.27.0; extra == "api"
+Requires-Dist: pydantic>=2.0.0; extra == "api"
+Provides-Extra: dashboard
+Requires-Dist: streamlit>=1.30.0; extra == "dashboard"
+Requires-Dist: plotly>=5.18.0; extra == "dashboard"
+Requires-Dist: pandas>=2.0.0; extra == "dashboard"
+Provides-Extra: gemini
+Requires-Dist: google-genai>=1.0.0; extra == "gemini"
+
+# VerifyIQ — Automated Damage Claim Verification
 
 [![Tests](https://github.com/verifyiq/verifyiq/actions/workflows/tests.yml/badge.svg)](https://github.com/verifyiq/verifyiq/actions/workflows/tests.yml)
 [![Tests](https://img.shields.io/badge/tests-58%2F58-green)]()
@@ -8,20 +51,11 @@
 
 ---
 
-## What Is VerifyIQ?
+## Overview
 
-**VerifyIQ is a production-oriented AI agent framework for multimodal claim verification.** It performs reasoning, risk analysis, fraud detection, and decision-making using observations supplied by external vision providers (VLMs). Users configure their own VLM — Gemini, OpenRouter, local models, or custom providers. **VerifyIQ does not contain a proprietary vision model.**
+VerifyIQ is a modular, deterministic AI system that automates damage claim verification. It analyzes submitted images and claim conversations, extracts visual evidence using Google Gemini, and applies a strict rule engine to determine whether a claim is supported, contradicted, or requires more information.
 
-The framework uses a deterministic rule engine, risk analyzer, and severity engine to make decisions based on structured observations extracted by the configured vision provider. The quality of image understanding depends entirely on the configured vision provider — better VLMs produce better observations, which lead to more accurate decisions.
-
-| What VerifyIQ Is | What VerifyIQ Is Not |
-|---|---|
-| AI agent framework for claim verification | A proprietary AI model or VLM |
-| Pluggable observation provider system | An autonomous insurance AI |
-| Explainable decision engine with traceable justifications | A black-box classifier |
-| Deterministic rule-based verification | A pure LLM/VLM end-to-end system |
-
-**Key message:** VerifyIQ brings the agent framework and reasoning engine. You bring the vision model.
+The system is designed for **reliability, reproducibility, and explainability** — every decision has a traceable justification, every component has a fallback, and identical inputs always produce identical outputs.
 
 ---
 
@@ -43,8 +77,7 @@ Automated verification must match or exceed human accuracy while being faster, c
 | Principle | Implementation |
 |-----------|---------------|
 | **Deterministic where possible** | Rule engine, risk analyzer, severity engine — all pure functions |
-| **VLM as observer, framework as judge** | External VLMs extract visual *facts*; rules make *decisions* |
-| **Bring Your Own VLM** | Pluggable provider interface supports Gemini, OpenRouter, GPT-4o Vision, Qwen-VL, MiniCPM-V, InternVL, and custom providers |
+| **AI as sensor, not judge** | Gemini extracts visual *facts*; rules make *decisions* |
 | **Zero crashes** | Every component wrapped in try/catch with sensible fallbacks |
 | **Explainable by design** | Every output includes a human-readable justification trace |
 | **Testable at every level** | Each component independently unit-testable |
@@ -80,12 +113,9 @@ Automated verification must match or exceed human accuracy while being faster, c
               │                     │                     │
               ▼                     ▼                     ▼
      ┌────────────────┐   ┌────────────────┐   ┌────────────────┐
-     │  VLM Provider  │   │  User History  │   │  CV Modules    │
+     │  Gemini Vision │   │  User History  │   │  CV Modules    │
      │  (observation  │   │  (fraud risk)  │   │ (blur, crop,   │
      │   extraction)  │   │                │   │  OCR, object)  │
-     │ Gemini,GPT-4o, │   │                │   │                │
-     │  OpenRouter,   │   │                │   │                │
-     │  Qwen-VL,...   │   │                │   │                │
      └────────┬───────┘   └────────┬───────┘   └────────┬───────┘
               │                     │                     │
               └──────────┬──────────┴──────────┬──────────┘
@@ -138,7 +168,7 @@ The pipeline processes each claim through 11 stages:
 | 2 | Image Validator | Checks size (<10MB), format, PIL decode integrity |
 | 3 | Image Normalizer | Converts AVIF/WebP/PNG/BMP to JPEG |
 | 4 | Claim Parser | Extracts claimed damage type and object part from conversation text, handles negation |
-| 5 | Vision Analyzer | Calls configured VLM provider (Gemini, OpenRouter, GPT-4o Vision, etc.) to extract per-image observations: damage type, visible parts, quality metrics |
+| 5 | Vision Analyzer | Calls Gemini to extract per-image observations: damage type, visible parts, quality metrics |
 | 6 | Evidence Checker | Evaluates whether images meet evidence requirements for the claim |
 | 7 | Rule Engine | Applies 6-path decision tree: support, contradict, or insufficient evidence |
 | 8 | Risk Analyzer | Computes risk flags from vision, rules, CV modules, and user history |
@@ -157,8 +187,8 @@ The pipeline processes each claim through 11 stages:
 - Severity assessment with context-aware boosting
 
 ### Reliability
-- **Safe Mode**: Every component wrapped in try/catch. If the VLM provider fails, the pipeline continues with degraded output
-- **VLM Cache**: SHA-256 hash-based response cache. Identical inputs = identical outputs, regardless of provider
+- **Safe Mode**: Every component wrapped in try/catch. If Gemini fails, the pipeline continues with degraded output
+- **Gemini Cache**: SHA-256 hash-based response cache. Identical inputs = identical outputs
 - **OCR Safe Mode**: When Tesseract is unavailable, returns "no text" for all images — gracefully, not crash
 - **Image Validation**: Rejects oversized (>10MB) or corrupt images before processing
 - **Fallback Output**: Every error path produces a valid output row with manual_review_required flag
@@ -187,7 +217,7 @@ The pipeline processes each claim through 11 stages:
 
 **Static evaluation** injects ideal vision results to test the deterministic pipeline in isolation.
 
-**Live evaluation** calls the configured VLM provider (Gemini used in competition submission) for each claim and compares all 7 output fields against expected values. Results will vary with different vision providers. Compatible damage types (crack↔glass_shatter, stain↔water_damage) are treated as matches.
+**Live evaluation** calls the Gemini API for each claim and compares all 7 output fields against expected values. Compatible damage types (crack↔glass_shatter, stain↔water_damage) are treated as matches.
 
 ---
 
@@ -303,19 +333,13 @@ verifyiq/
 ## Quick Start
 
 ```bash
-# Install core dependencies
-pip install verifyiq
+# Install dependencies
+pip install google-genai Pillow tqdm
 
-# Install your chosen VLM provider
-pip install verifyiq[gemini]     # Google Gemini
-pip install verifyiq[openrouter] # OpenRouter (multi-model)
-
-# Set provider credentials
+# Set your Gemini API key
 export GEMINI_API_KEY="your-key-here"
-# or for OpenRouter:
-export OPENROUTER_API_KEY="your-key-here"
 
-# Process claims
+# Process claims and produce output
 python code/main.py
 
 # Run evaluation on sample claims
@@ -325,35 +349,11 @@ python -m code.evaluation.evaluate
 python -m pytest code/tests/
 ```
 
-## Provider Setup
-
-VerifyIQ supports pluggable vision providers. The quality of image understanding depends entirely on the configured vision provider.
-
-| Provider | Setup | Dependency |
-|----------|-------|------------|
-| **Gemini** | `export GEMINI_API_KEY=...` | `verifyiq[gemini]` |
-| **OpenRouter** | `export OPENROUTER_API_KEY=...` | `verifyiq[openrouter]` |
-| **GPT-4o Vision** | `export OPENAI_API_KEY=...` | `openai` |
-| **Qwen-VL** | Local or API endpoint | Custom |
-| **MiniCPM-V** | Local or API endpoint | Custom |
-| **InternVL** | Local or API endpoint | Custom |
-| **Custom** | Implement `BaseVLMProvider` interface | Any |
-
-Configure your provider in `config.py` or via environment variable `VERIFYIQ_VLM_PROVIDER=gemini`.
-
-## Modes
-
-| Mode | Purpose |
-|------|---------|
-| **Production** | Full pipeline with live provider. Run `python code/main.py` |
-| **Demo** | Static evaluation with cached/idealized observations. No provider API calls needed: `python -m code.evaluation.static_evaluate` |
-| **Research** | Compare multiple providers, run ablation studies, benchmark accuracy. See `research/experiments/provider_comparison/` |
-
 ---
 
 ## Future Work
 
-- **Multi-provider consensus**: Run multiple VLMs in parallel and reach consensus via the consensus engine
+- **Multi-model vision**: Add GPT-4o or open-source VLM as secondary observer for comparison
 - **Parallel batch processing**: Process multiple claims concurrently with rate-limit awareness
 - **Confidence-based severity**: Replace static severity with confidence-weighted dynamic mapping
 - **Cross-claim fraud detection**: Link claims from the same user to detect patterns
@@ -366,13 +366,9 @@ Configure your provider in `config.py` or via environment variable `VERIFYIQ_VLM
 
 MIT License. See `ATTRIBUTIONS.md` for third-party license details.
 
-**Third-party dependencies (core):**
+**Third-party dependencies:**
+- `google-genai` — Apache 2.0
 - `Pillow` — Historical BSD-like
 - `opencv-python` — MIT
 - `pytesseract` — Apache 2.0
-
-**Provider-specific dependencies (optional):**
-- `google-genai` — Apache 2.0 (Gemini provider)
-- `httpx`, `websockets` — MIT/BSD (OpenRouter provider)
-- `openai` — MIT (GPT-4o Vision provider)
-- `pytest` — MIT (testing)
+- `pytest` — MIT

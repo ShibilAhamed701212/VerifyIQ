@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verifyiq"
+version = "0.1.0-dev"
+description = "Multi-modal claim verification platform"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "VerifyIQ Contributors" },
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+]
+
+keywords = [
+    "multimodal", "claim-verification", "fraud-detection",
+    "vlm", "insurance", "explainable-ai", "computer-vision",
+]
+
+dependencies = [
+    "Pillow>=10.0.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+v1 = []
+v2 = []
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+]
+api = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.27.0",
+    "pydantic>=2.0.0",
+]
+dashboard = [
+    "streamlit>=1.30.0",
+    "plotly>=5.18.0",
+    "pandas>=2.0.0",
+]
+gemini = [
+    "google-genai>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/verifyiq/verifyiq"
+Documentation = "https://github.com/verifyiq/verifyiq"
+Source = "https://github.com/verifyiq/verifyiq"
+Issues = "https://github.com/verifyiq/verifyiq/issues"
+
+[project.scripts]
+verifyiq = "verifyiq.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["verifyiq*"]
+exclude = ["verifyiq.tests*"]
+
+[tool.setuptools.package-data]
+"verifyiq" = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "code/tests",
+    "code/v2/tests",
+]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["verifyiq"]
+omit = ["*/tests/*"]

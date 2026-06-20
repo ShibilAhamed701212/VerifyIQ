@@ -2,13 +2,17 @@
 
 ## Overview
 
-VerifyIQ is a modular, deterministic AI system for automated damage claim verification. The architecture follows a pipeline pattern: each component processes the output of the previous one, with per-component error boundaries ensuring graceful degradation. The vision model is the only non-deterministic component; every downstream module applies hardcoded rules, static mappings, or logic trees that produce identical output for identical input.
+**VerifyIQ is a production-oriented AI agent framework for multimodal claim verification. It performs reasoning, risk analysis, fraud detection, and decision-making using observations supplied by external vision providers (VLMs). Users configure their own VLM — Gemini, OpenRouter, local models, or custom providers. VerifyIQ does not contain a proprietary vision model.**
+
+The architecture follows a pipeline pattern: each component processes the output of the previous one, with per-component error boundaries ensuring graceful degradation. The VLM observation provider is the only non-deterministic component; every downstream module applies hardcoded rules, static mappings, or logic trees that produce identical output for identical input.
 
 ```
 Input CSV --> Image Preprocessor --> Image Validator --> ClaimParser
                                                            |
                                                            v
-                                              GeminiVisionClient
+                                              VLM Provider
+                                         (Gemini, OpenRouter,
+                                          GPT-4o Vision, ...)
                                                            |
                                                            v
                                                  EvidenceChecker
@@ -98,18 +102,19 @@ Input CSV --> Image Preprocessor --> Image Validator --> ClaimParser
 
 ---
 
-### 4. GeminiVisionClient (`vision_analyzer.py:25-326`)
+### 4. VLM Observation Provider (`vision_analyzer.py:25-326`)
 
-**Purpose:** Extract visual observations from claim images using a vision language model. This is the only non-deterministic component in the pipeline.
+**Purpose:** Extract visual observations from claim images using a configurable vision language model provider. This is the only non-deterministic component in the pipeline.
 
 **Input:** `List[Path]` (image paths), `user_claim` (str), `claim_object` (str).
 
 **Output:** Structured dict with `damage_visible`, `damage_type`, `object_part`, `image_quality`, `supporting_images`, `confidence`, `per_image_assessments`, `conflicting_images`.
 
 **Key design decisions:**
-- The VLM is used **only for factual observation extraction**. It is explicitly instructed via `SYSTEM_PROMPT` to "Return visual observations only. Never output claim_status, approval, rejection, or policy decisions." This boundary prevents the model from making judgment calls that belong to downstream deterministic modules.
-- A hash-based response cache (`_cache_key` using SHA-256 of image paths + claim text + model name) eliminates API variance on cache hits. The cache is stored on disk under `.gemini_cache/`, making it persistent across runs.
-- Retry with exponential backoff handles rate limiting: 5 attempts with wait times of 5s, 10s, 20s, 40s, 80s. Rate-limit exhaustion returns an empty analysis rather than crashing.
+- The VLM is used **only for factual observation extraction**. It is explicitly instructed to "Return visual observations only. Never output claim_status, approval, rejection, or policy decisions." This boundary prevents the model from making judgment calls that belong to downstream deterministic modules.
+- Multiple providers are supported via the `BaseVLMProvider` interface: Gemini, OpenRouter, GPT-4o Vision, Qwen-VL, MiniCPM-V, InternVL, and custom providers. The provider is configured in `config.py` or via `VERIFYIQ_VLM_PROVIDER` environment variable.
+- A hash-based response cache (`_cache_key` using SHA-256 of image paths + claim text + model name) eliminates API variance on cache hits. The cache is stored on disk, making it persistent across runs.
+- Provider-specific error handling: retry with exponential backoff handles rate limiting (5 attempts with wait times of 5s, 10s, 20s, 40s, 80s). Rate-limit exhaustion returns an empty analysis rather than crashing.
 - Each image gets a per-image assessment; an aggregation step (`_aggregate`) computes majority-vote damage type and object part across clear, well-angled images. Conflicting assessments (different damage types or parts across images) are flagged via `conflicting_images`.
 - Prompt enforces the exact output JSON shape with a restricted enum of damage types and object parts, reducing parsing failures.
 
@@ -117,9 +122,10 @@ Input CSV --> Image Preprocessor --> Image Validator --> ClaimParser
 - No API key: returns empty analysis (`_empty_analysis`).
 - Empty response or parse failure: returns empty analysis with descriptive error in `notes`.
 - Individual image read failure: logged, image skipped, remaining images processed.
+- Provider service outage or rate limit: degraded observation with diagnostic note.
 - The orchestrator wraps the call at `claim_processor.py:89-98` to catch any unexpected exceptions.
 
-**Dependencies:** `google.genai` (Gemini SDK), `config.py`, `prompts.py`, `utils.py`.
+**Dependencies:** `config.py`, `prompts.py`, `utils.py`. Provider-specific SDKs (e.g., `google.genai`, `httpx`, `openai`) are optional, loaded dynamically based on configured provider.
 
 ---
 
@@ -281,10 +287,10 @@ Input CSV --> Image Preprocessor --> Image Validator --> ClaimParser
 The pipeline processes one claim at a time. Here is the exact field flow through each stage:
 
 1. **CSV row** enters with `user_id`, `image_paths`, `user_claim`, `claim_object`.
-2. **ImagePreprocessor** converts non-JPEG images to JPEG; passes paths to ImageValidator and GeminiVisionClient.
+2. **ImagePreprocessor** converts non-JPEG images to JPEG; passes paths to ImageValidator and VLM provider.
 3. **ImageValidator** produces `per-image valid/errors` — consumed only as a warning log (processing continues regardless).
 4. **ClaimParser** extracts `claimed_damage_type`, `claimed_object_part` from `user_claim`.
-5. **GeminiVisionClient** produces `damage_visible`, `damage_type`, `object_part`, `confidence`, `supporting_images`, `per_image_assessments`, `conflicting_images`, `notes`.
+5. **VLM Observation Provider** (Gemini, OpenRouter, GPT-4o Vision, etc.) produces `damage_visible`, `damage_type`, `object_part`, `confidence`, `supporting_images`, `per_image_assessments`, `conflicting_images`, `notes`.
 6. **EvidenceChecker** takes `claim_object`, `parser_result`, `vision_result` and produces `evidence_standard_met`, `reason`, `valid_image`.
 7. **RuleEngine** takes `parser_result`, `vision_result`, `evidence_result` and produces `claim_status`, `mismatch_type`, `justification`, `review_candidate`, `risk_flags`.
 8. **RiskAnalyzer** takes all prior results plus `user_history` and `image_paths` and produces a sorted `List[str]` of risk flags.

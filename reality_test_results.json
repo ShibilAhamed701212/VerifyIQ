@@ -1,0 +1,990 @@
+{
+  "results": [
+    {
+      "id": "1",
+      "text": "There is a dent on my front bumper after I hit a pole.",
+      "object": "car",
+      "damage_hint": "dent",
+      "user": "user001",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.9
+    },
+    {
+      "id": "2",
+      "text": "The rear bumper has a large scratch from a parking incident.",
+      "object": "car",
+      "damage_hint": "scratch",
+      "user": "user002",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "3",
+      "text": "Windshield cracked after a rock hit it on the highway.",
+      "object": "car",
+      "damage_hint": "crack",
+      "user": "user003",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "4",
+      "text": "My headlight is shattered after someone hit my car in the lot.",
+      "object": "car",
+      "damage_hint": "glass_shatter",
+      "user": "user004",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "5",
+      "text": "The side mirror is completely broken off.",
+      "object": "car",
+      "damage_hint": "broken_part",
+      "user": "user005",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "6",
+      "text": "Something is wrong with my car door.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user006",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "7",
+      "text": "The car got damaged somehow.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user007",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "8",
+      "text": "I need to file a claim for my vehicle.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user008",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "9",
+      "text": "There's some issue with the front area of the car.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user009",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "10",
+      "text": "My car was hit but I don't know where.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user010",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "11",
+      "text": "The hood is dented but there is absolutely no damage to the hood.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user011",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "12",
+      "text": "My windshield is both cracked and perfectly fine.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user012",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "possible_sarcasm",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "13",
+      "text": "The front bumper needs replacement but nothing happened to it.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user013",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "14",
+      "text": "Taillight is shattered but the car is undamaged.",
+      "object": "car",
+      "damage_hint": "unknown",
+      "user": "user014",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "15",
+      "text": "I scratched all four doors and the roof \u2014 please cover everything.",
+      "object": "car",
+      "damage_hint": "scratch",
+      "user": "user015",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "16",
+      "text": "Third claim this week. The fender is dented again.",
+      "object": "car",
+      "damage_hint": "dent",
+      "user": "user016",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "17",
+      "text": "My bumper has a crack. I hit nothing. It just appeared.",
+      "object": "car",
+      "damage_hint": "crack",
+      "user": "user017",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "18",
+      "text": "The body has multiple dents everywhere. Total replacement needed.",
+      "object": "car",
+      "damage_hint": "dent",
+      "user": "user018",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "19",
+      "text": "My laptop screen is cracked from the corner.",
+      "object": "laptop",
+      "damage_hint": "crack",
+      "user": "user019",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "20",
+      "text": "The keyboard has a broken key from a spill.",
+      "object": "laptop",
+      "damage_hint": "broken_part",
+      "user": "user020",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "21",
+      "text": "The hinge snapped when I closed the lid.",
+      "object": "laptop",
+      "damage_hint": "broken_part",
+      "user": "user021",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "22",
+      "text": "Water damaged the trackpad and it no longer clicks.",
+      "object": "laptop",
+      "damage_hint": "water_damage",
+      "user": "user022",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "23",
+      "text": "Something is broken on my laptop.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user023",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "24",
+      "text": "The laptop screen area has an issue.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user024",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "25",
+      "text": "My device was damaged in shipping.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user025",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "26",
+      "text": "There might be a problem with the lid.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user026",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.1,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "uncertain_claim",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "27",
+      "text": "Screen is cracked but works fine with no visible damage.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user027",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "28",
+      "text": "The entire laptop is destroyed except it looks brand new.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user028",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "29",
+      "text": "Keyboard is missing keys. All keys are present.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user029",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "30",
+      "text": "My laptop was working before the flight but after landing it was broken. I did not drop it.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user030",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "31",
+      "text": "Fifth claim this year. The screen cracked again.",
+      "object": "laptop",
+      "damage_hint": "crack",
+      "user": "user031",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "32",
+      "text": "The water damage was already there when I opened the box. I did not spill anything.",
+      "object": "laptop",
+      "damage_hint": "water_damage",
+      "user": "user032",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "33",
+      "text": "I need a full replacement. The laptop has dents on every surface.",
+      "object": "laptop",
+      "damage_hint": "dent",
+      "user": "user033",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "34",
+      "text": "The laptop was stolen but I have pictures from before.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user034",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "35",
+      "text": "I dropped coffee on the keyboard last week. It still works but some keys stick.",
+      "object": "laptop",
+      "damage_hint": "water_damage",
+      "user": "user035",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "36",
+      "text": "The screen flickers sometimes. Might be loose connection.",
+      "object": "laptop",
+      "damage_hint": "unknown",
+      "user": "user036",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.1,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "uncertain_claim",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "37",
+      "text": "The box arrived crushed on the corner.",
+      "object": "package",
+      "damage_hint": "crushed_packaging",
+      "user": "user037",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "38",
+      "text": "The package has a water stain from rain during delivery.",
+      "object": "package",
+      "damage_hint": "stain",
+      "user": "user038",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "39",
+      "text": "The seal is torn and the contents fell out.",
+      "object": "package",
+      "damage_hint": "torn_packaging",
+      "user": "user039",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "40",
+      "text": "The package side is completely crushed.",
+      "object": "package",
+      "damage_hint": "crushed_packaging",
+      "user": "user040",
+      "classification": "clear",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "41",
+      "text": "Something is wrong with the packaging.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user041",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "42",
+      "text": "The item was not in good condition when I got it.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user042",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "43",
+      "text": "I received a damaged delivery today.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user043",
+      "classification": "vague",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "44",
+      "text": "The box is both crushed and in perfect condition.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user044",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "possible_sarcasm",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "45",
+      "text": "The seal was broken but nothing could have fallen out.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user045",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "46",
+      "text": "Stains all over but nothing was spilled on it.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user046",
+      "classification": "contradictory",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "47",
+      "text": "I order expensive items every week and every single one arrives damaged.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user047",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "48",
+      "text": "Eighth damaged shipment this month from same address.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user048",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "49",
+      "text": "The outer box is crushed but the inner item is fine. Still want full refund.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user049",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    },
+    {
+      "id": "50",
+      "text": "Multiple items in same box all have different damage types.",
+      "object": "package",
+      "damage_hint": "unknown",
+      "user": "user050",
+      "classification": "suspicious",
+      "status": "not_enough_information",
+      "confidence": 0.2,
+      "severity": "unknown",
+      "risk_flags": [
+        "evidence_insufficient",
+        "manual_review_required"
+      ],
+      "valid_image": false,
+      "evidence_met": false,
+      "justification": "Contradicted because: Claim status: not_enough_information; Evidence insufficient: No images were submitted. Requirement",
+      "latency_ms": 0.0
+    }
+  ],
+  "stats": {
+    "supported": 0,
+    "contradicted": 0,
+    "not_enough_information": 50,
+    "error": 0
+  },
+  "by_class": {
+    "clear": {
+      "supported": 0,
+      "contradicted": 0,
+      "not_enough_information": 16,
+      "total": 16
+    },
+    "vague": {
+      "supported": 0,
+      "contradicted": 0,
+      "not_enough_information": 12,
+      "total": 12
+    },
+    "contradictory": {
+      "supported": 0,
+      "contradicted": 0,
+      "not_enough_information": 10,
+      "total": 10
+    },
+    "suspicious": {
+      "supported": 0,
+      "contradicted": 0,
+      "not_enough_information": 12,
+      "total": 12
+    }
+  }
+}
