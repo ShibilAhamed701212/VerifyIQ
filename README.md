@@ -1,18 +1,14 @@
 # VerifyIQ — AI Agent Framework for Claim Verification
 
 [![Tests](https://github.com/verifyiq/verifyiq/actions/workflows/tests.yml/badge.svg)](https://github.com/verifyiq/verifyiq/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-58%2F58-green)]()
-[![Static Accuracy](https://img.shields.io/badge/static%20accuracy-100%25-brightgreen)]()
 [![Python](https://img.shields.io/badge/python-3.12-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
 
 ## What Is VerifyIQ?
 
 **VerifyIQ is a production-oriented AI agent framework for multimodal claim verification.** It performs reasoning, risk analysis, fraud detection, and decision-making using observations supplied by external vision providers (VLMs). Users configure their own VLM — Gemini, OpenRouter, local models, or custom providers. **VerifyIQ does not contain a proprietary vision model.**
-
-The framework uses a deterministic rule engine, risk analyzer, and severity engine to make decisions based on structured observations extracted by the configured vision provider. The quality of image understanding depends entirely on the configured vision provider — better VLMs produce better observations, which lead to more accurate decisions.
 
 | What VerifyIQ Is | What VerifyIQ Is Not |
 |---|---|
@@ -21,358 +17,118 @@ The framework uses a deterministic rule engine, risk analyzer, and severity engi
 | Explainable decision engine with traceable justifications | A black-box classifier |
 | Deterministic rule-based verification | A pure LLM/VLM end-to-end system |
 
-**Key message:** VerifyIQ brings the agent framework and reasoning engine. You bring the vision model.
-
 ---
 
-## Problem
+## Quick Start
 
-Manual damage claim verification is:
-
-- **Slow** — Each claim requires human review of images and text
-- **Inconsistent** — Different reviewers make different decisions
-- **Expensive** — Expert review costs scale linearly with volume
-- **Non-transparent** — Claimants don't understand why decisions were made
-
-Automated verification must match or exceed human accuracy while being faster, cheaper, and fully transparent.
-
----
-
-## Design Philosophy
-
-| Principle | Implementation |
-|-----------|---------------|
-| **Deterministic where possible** | Rule engine, risk analyzer, severity engine — all pure functions |
-| **VLM as observer, framework as judge** | External VLMs extract visual *facts*; rules make *decisions* |
-| **Bring Your Own VLM** | Pluggable provider interface supports Gemini, OpenRouter, GPT-4o Vision, Qwen-VL, MiniCPM-V, InternVL, and custom providers |
-| **Zero crashes** | Every component wrapped in try/catch with sensible fallbacks |
-| **Explainable by design** | Every output includes a human-readable justification trace |
-| **Testable at every level** | Each component independently unit-testable |
-
----
-
-## Architecture
-
-```
-                         ┌─────────────────────┐
-                         │   Input Claims.csv   │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │   Image Loader &    │
-                         │    Validator        │
-                         │  (size, format,     │
-                         │   corruption check) │
-                         └──────────┬──────────┘
-                                    │
-                         ┌─────────────────────┐
-                         │  Image Normalizer   │
-                         │ (AVIF/WebP/PNG→JPEG)│
-                         └──────────┬──────────┘
-                                    │
-                         ┌─────────────────────┐
-                         │  Claim Parser       │
-                         │ (keyword + negation)│
-                         └──────────┬──────────┘
-                                    │
-              ┌─────────────────────┼─────────────────────┐
-              │                     │                     │
-              ▼                     ▼                     ▼
-     ┌────────────────┐   ┌────────────────┐   ┌────────────────┐
-     │  VLM Provider  │   │  User History  │   │  CV Modules    │
-     │  (observation  │   │  (fraud risk)  │   │ (blur, crop,   │
-     │   extraction)  │   │                │   │  OCR, object)  │
-     │ Gemini,GPT-4o, │   │                │   │                │
-     │  OpenRouter,   │   │                │   │                │
-     │  Qwen-VL,...   │   │                │   │                │
-     └────────┬───────┘   └────────┬───────┘   └────────┬───────┘
-              │                     │                     │
-              └──────────┬──────────┴──────────┬──────────┘
-                         │                     │
-                         ▼                     ▼
-              ┌────────────────┐   ┌────────────────┐
-              │ Evidence       │   │ Rule Engine    │
-              │ Checker        │   │ (6 decision    │
-              │ (requirements) │   │  paths)        │
-              └────────┬───────┘   └────────┬───────┘
-                       │                    │
-                       └──────────┬─────────┘
-                                  │
-                                  ▼
-                    ┌─────────────────────────┐
-                    │   Risk Analyzer         │
-                    │ (15+ risk flag sources) │
-                    └────────────┬────────────┘
-                                 │
-                    ┌─────────────────────────┐
-                    │   Severity Engine       │
-                    │ (static + boost words)  │
-                    └────────────┬────────────┘
-                                 │
-                    ┌─────────────────────────┐
-                    │   Output Validator      │
-                    │ (schema + consistency)  │
-                    └────────────┬────────────┘
-                                 │
-                    ┌─────────────────────────┐
-                    │   Submission Critic     │
-                    │ (post-processing check) │
-                    └────────────┬────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │   Output.csv            │
-                    └─────────────────────────┘
+```bash
+pip install verifyiq               # Core framework
+pip install verifyiq[gemini]       # Gemini provider
+export GEMINI_API_KEY="your-key"
+verifyiq evaluate                  # Run on sample claims
 ```
 
----
-
-## Pipeline
-
-The pipeline processes each claim through 11 stages:
-
-| Stage | Component | What It Does |
-|-------|-----------|-------------|
-| 1 | Image Loader | Parses CSV image paths, resolves relative paths |
-| 2 | Image Validator | Checks size (<10MB), format, PIL decode integrity |
-| 3 | Image Normalizer | Converts AVIF/WebP/PNG/BMP to JPEG |
-| 4 | Claim Parser | Extracts claimed damage type and object part from conversation text, handles negation |
-| 5 | Vision Analyzer | Calls configured VLM provider (Gemini, OpenRouter, GPT-4o Vision, etc.) to extract per-image observations: damage type, visible parts, quality metrics |
-| 6 | Evidence Checker | Evaluates whether images meet evidence requirements for the claim |
-| 7 | Rule Engine | Applies 6-path decision tree: support, contradict, or insufficient evidence |
-| 8 | Risk Analyzer | Computes risk flags from vision, rules, CV modules, and user history |
-| 9 | Severity Engine | Maps damage type + claim context to severity (none/low/medium/high) |
-| 10 | Output Validator | Validates schema, enums, and output consistency (catches contradictions) |
-| 11 | Submission Critic | Post-processing check for missing flags, critical patterns |
-
----
-
-## Features
-
-### Core Verification
-- Damage type classification (dent, scratch, crack, glass_shatter, water_damage, stain, torn/crushed packaging, broken/missing parts)
-- Object part identification (car parts, laptop components, package regions)
-- Evidence requirement checking against configurable rules
-- Severity assessment with context-aware boosting
-
-### Reliability
-- **Safe Mode**: Every component wrapped in try/catch. If the VLM provider fails, the pipeline continues with degraded output
-- **VLM Cache**: SHA-256 hash-based response cache. Identical inputs = identical outputs, regardless of provider
-- **OCR Safe Mode**: When Tesseract is unavailable, returns "no text" for all images — gracefully, not crash
-- **Image Validation**: Rejects oversized (>10MB) or corrupt images before processing
-- **Fallback Output**: Every error path produces a valid output row with manual_review_required flag
-
-### Explainability
-- Every output includes a `claim_status_justification` trace showing the reasoning chain
-- Risk flags document specific concerns (blurry_image, wrong_object, low_light, etc.)
-- Severity decisions reference specific damage type and boost keywords
-
-### Fraud Detection
-- User history analysis (claim frequency, rejection rate)
-- Wrong object detection via CV module
-- Non-original image detection (screenshots, stock photos)
-- Cross-image conflict detection (inconsistent damage across images)
-
----
-
-## Evaluation
-
-| Metric | Static Evaluation | Live Evaluation |
-|--------|------------------|-----------------|
-| Accuracy | 20/20 (100%) | ~70% |
-| Claims | 20 (with ideal vision) | 20 (with Gemini vision) |
-| Runtime | ~5 seconds | ~3-5 minutes |
-| API calls | 0 | 20 |
-
-**Static evaluation** injects ideal vision results to test the deterministic pipeline in isolation.
-
-**Live evaluation** calls the configured VLM provider (Gemini used in competition submission) for each claim and compares all 7 output fields against expected values. Results will vary with different vision providers. Compatible damage types (crack↔glass_shatter, stain↔water_damage) are treated as matches.
-
----
-
-## Testing
-
-```
-tests/
-├── test_parser.py           # ClaimParser negation, keyword matching
-├── test_rule_engine.py      # RuleEngine 6 decision paths, compatible types
-├── test_risk_flags.py       # Risk flag whitelist validation
-├── test_cv.py               # Blur, crop, object detection
-├── test_utils.py            # Text extraction utilities
-├── test_validator.py        # Output consistency checks
-├── test_critic.py           # Submission post-processing
-└── test_image_validator.py  # Image validation logic
-
-Total: 58 tests — all passing
-```
-
----
-
-## Results
-
-From the competition evaluation on 20 sample claims:
-
-| Status | Claims |
-|--------|--------|
-| Supported | 10 |
-| Contradicted | 9 |
-| Not Enough Information | 1 |
-
-From production processing on 44 actual claims:
-- 44/44 claims processed (100% completion)
-- 1 degraded output (user_047 — Gemini 503 error caught by Safe Mode)
-- ~0:06:00 runtime at ~$0.01 API cost
+See [docs/deployment](docs/deployment/) for Docker, CI/CD, and packaging guides.
 
 ---
 
 ## Project Structure
 
 ```
-verifyiq/
-├── code/                        # Core pipeline (frozen)
-│   ├── main.py                  # Entry point
-│   ├── claim_processor.py       # Orchestrator
-│   ├── claim_parser.py          # Text parser
-│   ├── vision_analyzer.py       # Gemini client
-│   ├── evidence_checker.py      # Evidence rules
-│   ├── rule_engine.py           # Decision engine
-│   ├── risk_analyzer.py         # Risk computation
-│   ├── severity_engine.py       # Severity mapping
-│   ├── decision_agent.py        # Output assembly
-│   ├── output_validator.py      # Schema validation
-│   ├── submission_critic.py     # Post-processing
-│   ├── image_preprocessor.py    # Format conversion
-│   ├── image_validator.py       # Image validation
-│   ├── config.py                # Configuration
-│   ├── prompts.py               # Gemini prompts
-│   ├── utils.py                 # Helpers
-│   ├── cv/                      # Computer vision
-│   │   ├── blur_detector.py
-│   │   ├── crop_detector.py
-│   │   ├── text_detector.py
-│   │   └── object_validator.py
-│   ├── tests/                   # Unit tests
-│   └── evaluation/              # Evaluation pipeline
-│       ├── evaluate.py
-│       ├── static_evaluate.py
-│       └── error_analysis.py
-├── dataset/                     # Input data
-├── docs/                        # Documentation
-│   ├── ARCHITECTURE.md
-│   ├── EVALUATION.md
-│   ├── RELIABILITY.md
-│   ├── SECURITY.md
-│   ├── REPRODUCIBILITY.md
-│   ├── ADVERSARIAL_TESTING.md
-│   ├── JUDGE_INTERVIEW.md
-│   └── WINNING_REVIEW.md
-├── reports/                     # Evaluation reports & reviews
-│   ├── FINAL_REVIEW.md          # Multi-persona final review
-│   ├── FINAL_VERDICT.md         # Weighted score & ranking
-│   ├── TREE_AUDIT.md            # File tree audit
-│   ├── ORGANIZATION_REVIEW.md   # Organization review
-│   ├── winning_report.md        # Winning analysis
-│   ├── executive_scorecard.md   # Executive dash scorecard
-│   ├── security_report.md       # Security assessment
-│   ├── reproducibility_report.md# Reproducibility audit
-│   ├── adversarial_report.md    # Adversarial testing results
-│   ├── competitor_report.md     # Competitor analysis
-│   ├── scalability_report.md    # Throughput & cost estimates
-│   ├── architecture_review.md   # Architecture decision review
-│   └── PROJECT_FLOW_REPORT.md   # Project flow overview
-├── development/                 # Development context (preserved)
-│   ├── CLAUDE.md                # Agent instructions (frozen)
-│   └── AGENT_HISTORY.log        # Session history
-├── archive/                     # Reference materials (preserved)
-│   ├── challenge_instructions_extracted.txt
-│   ├── ARCHITECTURE.md          # Superseded by docs/
-│   └── judge_interview.md       # Superseded by docs/
-├── adversarial_evaluation/      # Adversarial testing artifacts
-├── submission/                  # Judge submission package
-├── README.md                    # This file
-├── AGENTS.md                    # Agent orchestration rules
-├── problem_statement.md         # Challenge description
-├── ATTRIBUTIONS.md              # Licenses & attributions
-├── PROJECT_IDENTITY.md          # Project philosophy
-└── requirements.txt
+verifyiq/              ← pip-installable Python package
+  v1/                  ← V1 wrappers (frozen competition system)
+  v2/                  ← V2 production pipeline
+    pipeline.py        ← 10-layer orchestrator
+    models/            ← Data models
+    providers/         ← VLM provider ABC + implementations
+    security/          ← Input sanitization
+    observability/     ← Logging, metrics, tracing
+    fraud/             ← Fraud detection
+    confidence/        ← Confidence calibration
+    consensus/         ← Multi-model consensus
+    conversation/      ← Conversational analysis
+    review_queue.py    ← Human-in-the-loop review
+    persistence.py     ← SQLite storage
+    vision_manager.py  ← VLM availability with circuit breaker
+docs/                  ← All documentation
+  architecture/        ← System architecture docs
+  api/                 ← API reference
+  security/            ← Security and adversarial testing
+  production/          ← Production readiness, health
+  evaluation/          ← Evaluation methodology
+  deployment/          ← CI/CD, Docker, PyPI guides
+  open_source/         ← Governance, community guides
+tests/                 ← All tests (135 cases)
+  v1/                  ← V1 tests (58)
+  v2/                  ← V2 tests (77)
+examples/              ← Example scripts
+  providers/           ← Provider setup examples
+api/                   ← FastAPI standalone service
+dashboard/             ← Streamlit monitoring dashboard
+reports/               ← Evaluation reports, audits, scorecards
+scripts/               ← Deploy and utility scripts
+docker/                ← Dockerfiles and compose
+research/              ← Validation scripts and research
+dataset/               ← CSV data and sample images
+code/                  ← Frozen V1 system (archived reference)
+archive/               ← Historical competition artifacts
+submission/            ← Competition submission package
 ```
 
 ---
 
-## Quick Start
+## Architecture
 
-```bash
-# Install core dependencies
-pip install verifyiq
-
-# Install your chosen VLM provider
-pip install verifyiq[gemini]     # Google Gemini
-pip install verifyiq[openrouter] # OpenRouter (multi-model)
-
-# Set provider credentials
-export GEMINI_API_KEY="your-key-here"
-# or for OpenRouter:
-export OPENROUTER_API_KEY="your-key-here"
-
-# Process claims
-python code/main.py
-
-# Run evaluation on sample claims
-python -m code.evaluation.evaluate
-
-# Run tests
-python -m pytest code/tests/
+```
+Input Claims.csv → Image Validator → Claim Parser → VLM Provider (external)
+                                                      ↓
+                              Evidence Checker ← Observation Report
+                                      ↓
+                              Rule Engine (6 decision paths)
+                                      ↓
+                              Risk Analyzer → Severity Engine
+                                      ↓
+                              Output Validator → Output.csv
 ```
 
-## Provider Setup
+The framework is deterministic where possible. VLMs act as **observers** — they extract visual facts. The rule engine makes **decisions** based on those facts.
 
-VerifyIQ supports pluggable vision providers. The quality of image understanding depends entirely on the configured vision provider.
-
-| Provider | Setup | Dependency |
-|----------|-------|------------|
-| **Gemini** | `export GEMINI_API_KEY=...` | `verifyiq[gemini]` |
-| **OpenRouter** | `export OPENROUTER_API_KEY=...` | `verifyiq[openrouter]` |
-| **GPT-4o Vision** | `export OPENAI_API_KEY=...` | `openai` |
-| **Qwen-VL** | Local or API endpoint | Custom |
-| **MiniCPM-V** | Local or API endpoint | Custom |
-| **InternVL** | Local or API endpoint | Custom |
-| **Custom** | Implement `BaseVLMProvider` interface | Any |
-
-Configure your provider in `config.py` or via environment variable `VERIFYIQ_VLM_PROVIDER=gemini`.
+---
 
 ## Modes
 
-| Mode | Purpose |
-|------|---------|
-| **Production** | Full pipeline with live provider. Run `python code/main.py` |
-| **Demo** | Static evaluation with cached/idealized observations. No provider API calls needed: `python -m code.evaluation.static_evaluate` |
-| **Research** | Compare multiple providers, run ablation studies, benchmark accuracy. See `research/experiments/provider_comparison/` |
+| Mode | Command | Description |
+|------|---------|-------------|
+| Production | `python -m code.main` | Full pipeline with live VLM provider |
+| Demo | `python -m code.evaluation.static_evaluate` | Static evaluation with ideal observations |
+| API | `uvicorn api.main:app` | FastAPI service with health/metrics endpoints |
+| Dashboard | `streamlit run dashboard/app.py` | Real-time monitoring dashboard |
 
 ---
 
-## Future Work
+## Testing
 
-- **Multi-provider consensus**: Run multiple VLMs in parallel and reach consensus via the consensus engine
-- **Parallel batch processing**: Process multiple claims concurrently with rate-limit awareness
-- **Confidence-based severity**: Replace static severity with confidence-weighted dynamic mapping
-- **Cross-claim fraud detection**: Link claims from the same user to detect patterns
-- **Real-time processing**: Optimize for sub-second claim verification at scale
-- **Self-improving rules**: Learn optimal thresholds from evaluation feedback
+```bash
+pytest tests/              # 135 tests — all pass
+pytest tests/v1/           # V1: parser, rule engine, risk, CV, output
+pytest tests/v2/           # V2: pipeline, fraud, confidence, consensus, security, persistence
+```
+
+---
+
+## Provider Setup
+
+| Provider | Env Variable | Extras |
+|----------|-------------|--------|
+| Gemini | `GEMINI_API_KEY` | `verifyiq[gemini]` |
+| OpenRouter | `OPENROUTER_API_KEY` | `verifyiq[openrouter]` |
+| Local VLM | Local endpoint | Custom |
+| Custom | Any | Implement `VisionProvider` ABC |
+
+See [examples/providers/](examples/providers/) and [VISION_PROVIDER_REQUIREMENTS.md](VISION_PROVIDER_REQUIREMENTS.md).
 
 ---
 
 ## License
 
-MIT License. See `ATTRIBUTIONS.md` for third-party license details.
-
-**Third-party dependencies (core):**
-- `Pillow` — Historical BSD-like
-- `opencv-python` — MIT
-- `pytesseract` — Apache 2.0
-
-**Provider-specific dependencies (optional):**
-- `google-genai` — Apache 2.0 (Gemini provider)
-- `httpx`, `websockets` — MIT/BSD (OpenRouter provider)
-- `openai` — MIT (GPT-4o Vision provider)
-- `pytest` — MIT (testing)
+MIT License. See [LICENSE](LICENSE) for details.
