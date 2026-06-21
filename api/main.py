@@ -16,10 +16,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from code.v2.observability.metrics import get_collector
-from code.v2.observability.logging import get_logger
-from code.v2.tracer import Tracer
-from code.v2.vision_manager import VisionUnavailableError
+from verifyiq.v2.observability.metrics import get_collector
+from verifyiq.v2.observability.logging import get_logger
+from verifyiq.v2.tracer import Tracer
+from verifyiq.v2.vision_manager import VisionUnavailableError
 
 
 # ── Request / Response Models ──────────────────────────────────────────────

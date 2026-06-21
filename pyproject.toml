@@ -71,14 +71,16 @@ Issues = "https://github.com/verifyiq/verifyiq/issues"
 verifyiq = "verifyiq.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["verifyiq*"]
-exclude = ["verifyiq.tests*"]
+include = ["verifyiq*", "code*"]
+exclude = ["verifyiq.tests*", "code.tests*", "code.v2.tests*"]
 
 [tool.setuptools.package-data]
 "verifyiq" = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = [
+    "tests/v1",
+    "tests/v2",
     "code/tests",
     "code/v2/tests",
 ]

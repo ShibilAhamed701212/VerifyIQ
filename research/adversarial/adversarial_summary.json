@@ -1,0 +1,19 @@
+{
+  "total": 100,
+  "processed": 100,
+  "status_counts": {
+    "not_enough_information": 100
+  },
+  "issue_type_counts": {
+    "unknown": 100
+  },
+  "risk_flag_counts": {
+    "damage_not_visible": 95,
+    "manual_review_required": 100,
+    "text_instruction_present": 12,
+    "blurry_image": 9
+  },
+  "severity_counts": {
+    "unknown": 100
+  }
+}

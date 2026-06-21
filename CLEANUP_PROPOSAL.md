@@ -1,113 +1,90 @@
-# Cleanup Proposal
+# Cleanup Proposal — VerifyIQ
 
-> **REQUIRES APPROVAL** before any deletion.
+Generated: 2026-06-20
 
-## Principles
-
-1. NO V1 files modified
-2. NO V2 files modified
-3. NO tests removed
-4. NO evaluations removed
-5. NO documentation removed (except duplicate/obsolete reports)
-6. Only unused imports, dead functions, dead storage, and empty placeholders
+> DO NOT DELETE without explicit approval. This document proposes removals.
 
 ---
 
-## Category A: Dead Imports (SAFE TO REMOVE)
+## 1. Empty/Redundant Directories
 
-These imports are declared but never referenced. Removing them has zero behavioral impact.
+| Path | Size | Proposal | Reason |
+|------|------|----------|--------|
+| `verifyiq/v2/recommender/` | 0 bytes | Delete | Empty leftover dir |
+| `code/v2/localization/` | 1 file (research.md) | Already moved to `research/localization/` | Contents relocated |
 
-| # | File | Line | Import | Risk |
-|---|------|------|--------|------|
-| A1 | `code/main.py` | 9 | `import sys` | None — never used |
-| A2 | `code/v2/observability/metrics.py` | 2 | `from collections import defaultdict` | None — never constructed |
-| A3 | `code/v2/models/consensus.py` | 2 | `from typing import Optional` | None — no Optional fields |
-| A4 | `code/v2/observability/tracing.py` | 4 | `from typing import Optional` | None — Optional never used |
+## 2. Temporary/One-off Files (→ research/validation/)
+
+Already moved. No deletion proposed.
+
+## 3. Duplicate Reports
+
+| Files | Proposal | Reason |
+|-------|----------|--------|
+| `reports/winning_report.md` ↔ `docs/WINNING_REVIEW.md` | Keep both? Check content | `docs/` version may be superseded |
+| `docs/evaluation/JUDGE_INTERVIEW.md` ↔ `archive/judge_interview.md` | Check content | Archive may hold older version |
+
+## 4. Generated Artifacts (Already in .gitignore)
+
+| Pattern | Proposal |
+|---------|----------|
+| `dist/` | Keep in .gitignore |
+| `verifyiq.egg-info/` | Keep in .gitignore |
+| `__pycache__/` | Keep in .gitignore |
+| `.pytest_cache/` | Keep in .gitignore |
+| `.ruff_cache/` | Keep in .gitignore |
+
+## 5. Stale/Dangling Files
+
+| File | Proposal | Reason |
+|------|----------|--------|
+| `docs/superpowers/plans/2026-06-19-leaderboard-score-optimization.md` | Archive or delete | Superseded plan |
+
+## 6. Frozen V1 Code
+
+| Path | Proposal | Status |
+|------|----------|--------|
+| `code/` | Keep as-is | FROZEN — no modifications |
+| `code/` → `archive/competition_v1/` | Move after approval | Awaiting user approval |
+
+## 7. Code Duplication Risk
+
+The following now exist in two locations:
+
+| Source | Copy | Status |
+|--------|------|--------|
+| `code/v2/` | `verifyiq/v2/` | Original kept for test compatibility |
+| `code/tests/` | `tests/v1/` | New canonical location |
+| `code/v2/tests/` | `tests/v2/` | New canonical location |
+
+**Proposal after validation:**
+- Tests should run from `tests/` only
+- `code/v2/` can be archived once `verifyiq/v2/` is verified in all paths
+- `code/tests/` and `code/v2/tests/` can be removed once all CI and workflows point to `tests/`
+
+## 8. Path Cleanup (pyproject.toml)
+
+Currently includes both old and new test paths:
+
+```toml
+testpaths = [
+    "tests/v1",
+    "tests/v2",
+    "code/tests",      # ← can be removed after migration
+    "code/v2/tests",   # ← can be removed after migration
+]
+```
+
+**Proposal:** Remove `code/tests` and `code/v2/tests` from testpaths after 1 week of stable CI runs.
 
 ---
 
-## Category B: Dead Functions (SAFE TO REMOVE)
+## Summary
 
-| # | File | Function | Risk | Notes |
-|---|------|----------|------|-------|
-| B1 | `code/utils.py:103` | `clamp(value, min_val, max_val)` | None — never called by any V1 or V2 path | 5-line utility function |
-| B2 | `code/evidence_checker.py:120` | `EvidenceChecker._part_visible()` | None — private method, never called | ~10 lines |
-
----
-
-## Category C: Dead Storage (SAFE TO REMOVE OR FIX)
-
-| # | File | Issue | Risk | Options |
-|---|------|-------|------|---------|
-| C1 | `code/image_preprocessor.py:18` | `_cleanup_dirs: List[Path] = []` grows unbounded | None — list is never read | Remove list OR add cleanup in `__del__` |
-
----
-
-## Category D: Empty Placeholder Modules (SAFE TO REMOVE)
-
-| # | Module | Content | Risk |
-|---|--------|---------|------|
-| D1 | `code/v2/decision/__init__.py` | Single comment line — no code, nothing imports it | None |
-
----
-
-## Category E: Unreachable Code (SAFE TO REMOVE)
-
-| # | File | Issue | Risk |
-|---|------|-------|------|
-| E1 | `verifyiq/__main__.py:30` | `"analyze"` subcommand registered but `if/elif` chain never handles it | None — falls through to exit 0 |
-
----
-
-## Category F: Unused Class (REVIEW REQUIRED)
-
-| # | Class | File | Notes |
-|---|-------|------|-------|
-| F1 | `TraceLogger` | `code/v2/observability/tracing.py` | Defined, exported in `__init__.py`, but never instantiated by pipeline, tests, or production code. Keep or integrate. |
-
----
-
-## Category  G: Obsolete/Stale Reports (ARCHIVE, NOT DELETE)
-
-These markdown files are generated outputs from validation scripts. They are useful for reference but take up space at root level. Recommend moving to `reports/` or `archive/`:
-
-All files marked with ✅ can be regenerated by running the corresponding validation script.
-
-| File | Generated By | Verifiable? |
-|------|-------------|-------------|
-| CONFIDENCE_ANALYSIS.md | validate_confidence.py | ✅ Can regenerate |
-| CONVERSATION_EVALUATION.md | validate_conversation.py | ✅ Can regenerate |
-| FRAUD_EVALUATION.md | validate_fraud.py | ✅ Can regenerate |
-| HIDDEN_TEST_SIMULATION.md | validate_hidden_tests.py | ✅ Can regenerate |
-| PERFORMANCE_REPORT.md | validate_performance.py | ✅ Can regenerate |
-| RELIABILITY_VALIDATION.md | validate_reliability.py | ✅ Can regenerate |
-
----
-
-## Summary of Changes
-
-| Category | Items | LOC to Remove | Risk |
-|----------|-------|---------------|------|
-| A: Dead imports | 4 | 4 lines | None |
-| B: Dead functions | 2 | ~15 lines | None |
-| C: Dead storage | 1 | ~5 lines | None |
-| D: Empty modules | 1 | ~3 lines | None |
-| E: Unreachable code | 1 | ~3 lines | None |
-| F: Unused class | 1 | Review needed | Low |
-| G: Stale reports | 6 | Move to archive/ | None |
-
-**Total safe to remove**: ~30 lines of code + 6 files to move.
-
-**Total requiring review**: 1 class (`TraceLogger`) — needs decision to integrate or remove.
-
-## APPROVAL REQUIRED
-
-Before proceeding with any deletion:
-
-- [ ] Approval for Category A (dead imports)?
-- [ ] Approval for Category B (dead functions)?
-- [ ] Approval for Category C (dead storage)?
-- [ ] Approval for Category D (empty modules)?
-- [ ] Approval for Category E (unreachable code)?
-- [ ] Decision on Category F (TraceLogger — keep or remove?)
-- [ ] Approval for Category G (archive stale reports)?
+| Category | Items | Action |
+|----------|-------|--------|
+| Delete safe | 1 empty dir | Delete |
+| Move pending | 1 archived plan | Archive |
+| Remove after validation | 2 old test paths | Wait |
+| Archive pending approval | `code/` → `archive/competition_v1/` | Wait |
+| Monitor | Duplicate test locations | Resolve in next pass |
